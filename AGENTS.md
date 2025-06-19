@@ -16,7 +16,7 @@ Main features:
 
 Note that the test is required only when you've modified the code not the document.
 
-1. npm run build
+1. npm install
 2. npm run test
 
 ## Coding Conventions
