@@ -9,10 +9,6 @@ export default async function AdminPage() {
   const weekStart = new Date();
   weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const week = await prisma.week.findUnique({
-    where: { startDate: weekStart },
-    include: { assignments: true },
-  });
 
   async function addMember(formData: FormData) {
     "use server";
