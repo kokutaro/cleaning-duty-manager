@@ -54,11 +54,11 @@ export default async function Home() {
         <div className="text-red-500">ユーザーが登録されていません。</div>
       ) : (
         <>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
             {assignmentsByPlace.map(({ place, member }) => (
               <div
                 key={place.id}
-                className="w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
+                className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
               >
                 <h2 className="text-lg font-semibold mb-2">{place.name}</h2>
                 <p>{member ? member.name : "未割当"}</p>
@@ -67,7 +67,7 @@ export default async function Home() {
           </div>
           {unassignedMembers.length > 0 && (
             <div className="mt-8">
-              <div className="w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
+              <div className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
                 <h2 className="text-lg font-semibold mb-2">なし</h2>
                 <ul className="list-disc list-inside">
                   {unassignedMembers.map((m) => (
