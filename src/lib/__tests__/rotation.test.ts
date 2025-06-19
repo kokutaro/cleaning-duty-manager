@@ -3,8 +3,9 @@ import { vi, expect, test, beforeEach } from 'vitest';
 vi.mock('../prisma', () => {
   const prisma = {
     week: { upsert: vi.fn().mockResolvedValue({ id: 1 }) },
-    place: { findMany: vi.fn().mockResolvedValue([{ id: 1 }, { id: 2 }]) },
-    member: { findMany: vi.fn().mockResolvedValue([{ id: 10 }, { id: 20 }]) },
+    place: { findMany: vi.fn().mockResolvedValue([{ id: 1, groupId: null }, { id: 2, groupId: null }]) },
+    member: { findMany: vi.fn().mockResolvedValue([{ id: 10, groupId: null }, { id: 20, groupId: null }]) },
+    group: { findMany: vi.fn().mockResolvedValue([]) },
     dutyAssignment: {
       findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn(),

@@ -24,22 +24,30 @@ export default async function Home() {
     },
   });
 
-  // 全ユーザー取得
-  const members = await prisma.member.findMany({ orderBy: { id: "asc" } });
+  const groups = await prisma.group.findMany({ orderBy: { id: "asc" } });
+  const members = await prisma.member.findMany({ include: { group: true }, orderBy: { id: "asc" } });
+  const places = await prisma.place.findMany({ include: { group: true }, orderBy: { id: "asc" } });
 
-  // 場所ごとの割り当てを検索
-  const places = await prisma.place.findMany({ orderBy: { id: "asc" } });
   const assignmentsByPlace = places.map((place) => {
     const assignment = week?.assignments.find((a) => a.placeId === place.id);
-    return {
-      place,
-      member: assignment?.member ?? null,
-    };
+    return { place, member: assignment?.member ?? null };
   });
+
   const assignedIds = assignmentsByPlace
     .map((a) => a.member?.id)
     .filter((id): id is number => id !== undefined);
   const unassignedMembers = members.filter((m) => !assignedIds.includes(m.id));
+
+  const groupedAssignments = [
+    ...groups.map((g) => ({
+      name: g.name,
+      places: assignmentsByPlace.filter((p) => p.place.groupId === g.id),
+    })),
+    {
+      name: "未割当",
+      places: assignmentsByPlace.filter((p) => p.place.groupId === null),
+    },
+  ];
 
   return (
     <main className="max-w-4xl mx-auto py-10">
@@ -54,14 +62,21 @@ export default async function Home() {
         <div className="text-red-500">ユーザーが登録されていません。</div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
-            {assignmentsByPlace.map(({ place, member }) => (
-              <div
-                key={place.id}
-                className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
-              >
-                <h2 className="text-lg font-semibold mb-2">{place.name}</h2>
-                <p>{member ? member.name : "未割当"}</p>
+          <div className="flex flex-col gap-8">
+            {groupedAssignments.map((g) => (
+              <div key={g.name}>
+                <h2 className="text-xl font-semibold mb-2">{g.name}</h2>
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
+                  {g.places.map(({ place, member }) => (
+                    <div
+                      key={place.id}
+                      className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
+                    >
+                      <h3 className="text-lg font-semibold mb-2">{place.name}</h3>
+                      <p>{member ? member.name : "未割当"}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

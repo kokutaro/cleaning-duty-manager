@@ -6,14 +6,17 @@ import { getWeekStart } from "@/lib/week";
 import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function AdminPage() {
-  const members = await prisma.member.findMany();
-  const places = await prisma.place.findMany();
+  const members = await prisma.member.findMany({ include: { group: true } });
+  const places = await prisma.place.findMany({ include: { group: true } });
+  const groups = await prisma.group.findMany();
 
   async function addMember(formData: FormData) {
     "use server";
     const name = formData.get("memberName") as string;
+    const groupIdValue = formData.get("memberGroupId") as string;
+    const groupId = groupIdValue ? Number(groupIdValue) : null;
     if (name) {
-      await prisma.member.create({ data: { name } });
+      await prisma.member.create({ data: { name, groupId } });
       await regenerateThisWeekAssignments();
       revalidatePath("/admin");
     }
@@ -22,8 +25,10 @@ export default async function AdminPage() {
   async function addPlace(formData: FormData) {
     "use server";
     const name = formData.get("placeName") as string;
+    const groupIdValue = formData.get("placeGroupId") as string;
+    const groupId = groupIdValue ? Number(groupIdValue) : null;
     if (name) {
-      await prisma.place.create({ data: { name } });
+      await prisma.place.create({ data: { name, groupId } });
       await regenerateThisWeekAssignments();
       revalidatePath("/admin");
     }
@@ -69,9 +74,50 @@ export default async function AdminPage() {
     revalidatePath("/admin");
   }
 
+  async function addGroup(formData: FormData) {
+    "use server";
+    const name = formData.get("groupName") as string;
+    if (name) {
+      await prisma.group.create({ data: { name } });
+      revalidatePath("/admin");
+    }
+  }
+
+  async function deleteGroup(formData: FormData) {
+    "use server";
+    const id = Number(formData.get("groupId"));
+    if (!id) return;
+    await prisma.group.delete({ where: { id } });
+    revalidatePath("/admin");
+  }
+
   return (
     <main className="max-w-lg mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">管理画面</h1>
+
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold mb-2">グループ登録</h2>
+        <form action={addGroup} className="flex gap-2 mb-4">
+          <input
+            name="groupName"
+            className="border px-2 py-1 rounded"
+            placeholder="グループ名"
+            required
+          />
+          <SubmitButton type="submit">追加</SubmitButton>
+        </form>
+        <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
+          {groups.map((g) => (
+            <li key={g.id} className="flex items-center justify-between px-4 py-2">
+              <span>{g.name}</span>
+              <form action={deleteGroup}>
+                <input type="hidden" name="groupId" value={g.id} />
+                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
+              </form>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="mb-10">
         <h2 className="text-lg font-semibold mb-2">ユーザー登録</h2>
@@ -82,12 +128,23 @@ export default async function AdminPage() {
             placeholder="名前"
             required
           />
+          <select name="memberGroupId" className="border px-2 py-1 rounded">
+            <option value="">未割当</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
           <SubmitButton type="submit">追加</SubmitButton>
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
             <li key={m.id} className="flex items-center justify-between px-4 py-2">
-              <span>{m.name}</span>
+              <span>
+                {m.name}
+                {m.group ? ` (${m.group.name})` : ""}
+              </span>
               <form action={deleteMember}>
                 <input type="hidden" name="memberId" value={m.id} />
                 <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
@@ -106,6 +163,14 @@ export default async function AdminPage() {
             placeholder="場所名"
             required
           />
+          <select name="placeGroupId" className="border px-2 py-1 rounded">
+            <option value="">未割当</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
           <SubmitButton variant="success" type="submit">
             追加
           </SubmitButton>
@@ -113,7 +178,10 @@ export default async function AdminPage() {
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
             <li key={p.id} className="flex items-center justify-between px-4 py-2">
-              <span>{p.name}</span>
+              <span>
+                {p.name}
+                {p.group ? ` (${p.group.name})` : ""}
+              </span>
               <form action={deletePlace}>
                 <input type="hidden" name="placeId" value={p.id} />
                 <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>

@@ -10,12 +10,16 @@ datasource db {
 model Member {
   id          Int              @id @default(autoincrement())
   name        String           @unique
+  group       Group?           @relation(fields: [groupId], references: [id])
+  groupId     Int?
   assignments DutyAssignment[]
 }
 
 model Place {
   id          Int              @id @default(autoincrement())
   name        String           @unique
+  group       Group?           @relation(fields: [groupId], references: [id])
+  groupId     Int?
   assignments DutyAssignment[]
 }
 
@@ -35,4 +39,11 @@ model DutyAssignment {
   memberId Int
 
   @@unique([weekId, placeId])
+}
+
+model Group {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  members Member[]
+  places  Place[]
 }
