@@ -38,16 +38,16 @@ export default async function Home() {
     .filter((id): id is number => id !== undefined);
   const unassignedMembers = members.filter((m) => !assignedIds.includes(m.id));
 
-  const groupedAssignments = [
-    ...groups.map((g) => ({
-      name: g.name,
-      places: assignmentsByPlace.filter((p) => p.place.groupId === g.id),
-    })),
-    {
-      name: "未割当",
-      places: assignmentsByPlace.filter((p) => p.place.groupId === null),
-    },
+  const allGroups = [
+    ...groups,
+    { id: null as number | null, name: "未割当" },
   ];
+
+  const groupedAssignments = allGroups.map((g) => ({
+    name: g.name,
+    places: assignmentsByPlace.filter((p) => p.place.groupId === g.id),
+    noneMembers: unassignedMembers.filter((m) => m.groupId === g.id),
+  }));
 
   return (
     <main className="max-w-4xl mx-auto py-10">
@@ -76,22 +76,20 @@ export default async function Home() {
                       <p>{member ? member.name : "未割当"}</p>
                     </div>
                   ))}
+                  {g.noneMembers.length > 0 && (
+                    <div className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
+                      <h3 className="text-lg font-semibold mb-2">なし</h3>
+                      <ul className="list-disc list-inside">
+                        {g.noneMembers.map((m) => (
+                          <li key={m.id}>{m.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-          {unassignedMembers.length > 0 && (
-            <div className="mt-8">
-              <div className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
-                <h2 className="text-lg font-semibold mb-2">なし</h2>
-                <ul className="list-disc list-inside">
-                  {unassignedMembers.map((m) => (
-                    <li key={m.id}>{m.name}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
         </>
       )}
     </main>
