@@ -27,17 +27,22 @@ export default async function Home() {
   // 全ユーザー取得
   const members = await prisma.member.findMany({ orderBy: { id: "asc" } });
 
-  // ユーザーごとに今週の割り当てを検索
-  const assignmentsByMember = members.map((member) => {
-    const assignment = week?.assignments.find((a) => a.memberId === member.id);
+  // 場所ごとの割り当てを検索
+  const places = await prisma.place.findMany({ orderBy: { id: "asc" } });
+  const assignmentsByPlace = places.map((place) => {
+    const assignment = week?.assignments.find((a) => a.placeId === place.id);
     return {
-      member,
-      place: assignment?.place?.name ?? "なし",
+      place,
+      member: assignment?.member ?? null,
     };
   });
+  const assignedIds = assignmentsByPlace
+    .map((a) => a.member?.id)
+    .filter((id): id is number => id !== undefined);
+  const unassignedMembers = members.filter((m) => !assignedIds.includes(m.id));
 
   return (
-    <main className="max-w-lg mx-auto py-10">
+    <main className="max-w-4xl mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">今週のお掃除当番</h1>
       <div className="mb-2 text-gray-500">
         週の開始日: {format(weekStart, "yyyy年MM月dd日")}
@@ -48,26 +53,31 @@ export default async function Home() {
       {members.length === 0 ? (
         <div className="text-red-500">ユーザーが登録されていません。</div>
       ) : (
-        <table className="w-full border border-neutral-700 mt-4 rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-neutral-800 text-neutral-300">
-              <th className="py-2 px-4 border-b border-neutral-700">担当者</th>
-              <th className="py-2 px-4 border-b border-neutral-700">場所</th>
-            </tr>
-          </thead>
-          <tbody>
-            {assignmentsByMember.map(({ member, place }) => (
-              <tr key={member.id} className="even:bg-neutral-800">
-                <td className="py-2 px-4 border-b border-neutral-700">
-                  {member.name}
-                </td>
-                <td className="py-2 px-4 border-b border-neutral-700">
-                  {place}
-                </td>
-              </tr>
+        <>
+          <div className="flex flex-wrap gap-4">
+            {assignmentsByPlace.map(({ place, member }) => (
+              <div
+                key={place.id}
+                className="w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
+              >
+                <h2 className="text-lg font-semibold mb-2">{place.name}</h2>
+                <p>{member ? member.name : "未割当"}</p>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+          {unassignedMembers.length > 0 && (
+            <div className="mt-8">
+              <div className="w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
+                <h2 className="text-lg font-semibold mb-2">なし</h2>
+                <ul className="list-disc list-inside">
+                  {unassignedMembers.map((m) => (
+                    <li key={m.id}>{m.name}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </main>
   );
