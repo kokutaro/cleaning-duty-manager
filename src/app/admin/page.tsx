@@ -84,15 +84,13 @@ export default async function AdminPage() {
           />
           <Button type="submit">追加</Button>
         </form>
-        <ul className="list-disc pl-5">
+        <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
-            <li key={m.id} className="flex items-center gap-2">
-              {m.name}
+            <li key={m.id} className="flex items-center justify-between px-4 py-2">
+              <span>{m.name}</span>
               <form action={deleteMember}>
                 <input type="hidden" name="memberId" value={m.id} />
-                <ConfirmDeleteButton type="submit" className="ml-2">
-                  削除
-                </ConfirmDeleteButton>
+                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
               </form>
             </li>
           ))}
@@ -112,15 +110,13 @@ export default async function AdminPage() {
             追加
           </Button>
         </form>
-        <ul className="list-disc pl-5">
+        <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
-            <li key={p.id} className="flex items-center gap-2">
-              {p.name}
+            <li key={p.id} className="flex items-center justify-between px-4 py-2">
+              <span>{p.name}</span>
               <form action={deletePlace}>
                 <input type="hidden" name="placeId" value={p.id} />
-                <ConfirmDeleteButton type="submit" className="ml-2">
-                  削除
-                </ConfirmDeleteButton>
+                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
               </form>
             </li>
           ))}
