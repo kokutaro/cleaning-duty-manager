@@ -9,10 +9,6 @@ export default async function AdminPage() {
   const weekStart = new Date();
   weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const week = await prisma.week.findUnique({
-    where: { startDate: weekStart },
-    include: { assignments: true },
-  });
 
   async function addMember(formData: FormData) {
     "use server";
@@ -114,8 +110,11 @@ export default async function AdminPage() {
             <li key={p.id} className="flex items-center gap-2">
               {p.name}
               <form action={deletePlace}>
-                <input type="hidden" name="memberId" value={p.id} />
-                <ConfirmDeleteButton type="submit" className="ml-2 text-red-400 hover:text-red-600">
+                <input type="hidden" name="placeId" value={p.id} />
+                <ConfirmDeleteButton
+                  type="submit"
+                  className="ml-2 text-red-400 hover:text-red-600"
+                >
                   削除
                 </ConfirmDeleteButton>
               </form>
