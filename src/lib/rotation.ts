@@ -1,11 +1,10 @@
 import { prisma } from "./prisma";
+import { getWeekStart } from "./week";
 
 export async function regenerateThisWeekAssignments() {
   // 今週の開始日
   const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setHours(0, 0, 0, 0);
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const weekStart = getWeekStart(now);
 
   // 今週のWeekレコード
   const week = await prisma.week.upsert({
@@ -36,20 +35,16 @@ export async function regenerateThisWeekAssignments() {
   }
 }
 
-
 export async function advanceCurrentWeekRotation() {
   // 今週の開始日を計算
   const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setHours(0, 0, 0, 0);
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const weekStart = getWeekStart(now);
 
   const week = await prisma.week.upsert({
     where: { startDate: weekStart },
     update: {},
     create: { startDate: weekStart },
   });
-
 
   const places = await prisma.place.findMany({ orderBy: { id: "asc" } });
   const members = await prisma.member.findMany({ orderBy: { id: "asc" } });
@@ -85,6 +80,66 @@ export async function advanceCurrentWeekRotation() {
         weekId: week.id,
         placeId: places[i].id,
         memberId: members[(startIndex + i) % members.length].id,
+      },
+    });
+  }
+}
+
+export async function autoRotateIfNeeded(weekStart: Date) {
+  // 今週の割り当てが既にあれば何もしない
+  const week = await prisma.week.findUnique({
+    where: { startDate: weekStart },
+    include: { assignments: true },
+  });
+  if (week && week.assignments.length > 0) return;
+
+  const prevWeekStart = new Date(weekStart);
+  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+
+  const prevWeek = await prisma.week.findUnique({
+    where: { startDate: prevWeekStart },
+    include: {
+      assignments: {
+        include: { place: true, member: true },
+        orderBy: { placeId: "asc" },
+      },
+    },
+  });
+
+  const members = await prisma.member.findMany({ orderBy: { id: "asc" } });
+  const places = await prisma.place.findMany({ orderBy: { id: "asc" } });
+
+  const newWeek = await prisma.week.upsert({
+    where: { startDate: weekStart },
+    update: {},
+    create: { startDate: weekStart },
+  });
+
+  if (!prevWeek || prevWeek.assignments.length === 0) {
+    for (let i = 0; i < places.length; i++) {
+      await prisma.dutyAssignment.create({
+        data: {
+          weekId: newWeek.id,
+          placeId: places[i].id,
+          memberId: members[i % members.length].id,
+        },
+      });
+    }
+    return;
+  }
+
+  const prevMembers = prevWeek.assignments.map((a) => a.member);
+  const rotated = [
+    prevMembers[prevMembers.length - 1],
+    ...prevMembers.slice(0, -1),
+  ];
+
+  for (let i = 0; i < places.length; i++) {
+    await prisma.dutyAssignment.create({
+      data: {
+        weekId: newWeek.id,
+        placeId: places[i].id,
+        memberId: rotated[i % rotated.length].id,
       },
     });
   }
