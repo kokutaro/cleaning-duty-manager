@@ -91,6 +91,28 @@ export default async function AdminPage() {
     revalidatePath("/admin");
   }
 
+  async function updateMemberGroup(formData: FormData) {
+    "use server";
+    const id = Number(formData.get("memberId"));
+    const groupIdValue = formData.get("memberGroupId") as string;
+    const groupId = groupIdValue ? Number(groupIdValue) : null;
+    if (!id) return;
+    await prisma.member.update({ where: { id }, data: { groupId } });
+    await regenerateThisWeekAssignments();
+    revalidatePath("/admin");
+  }
+
+  async function updatePlaceGroup(formData: FormData) {
+    "use server";
+    const id = Number(formData.get("placeId"));
+    const groupIdValue = formData.get("placeGroupId") as string;
+    const groupId = groupIdValue ? Number(groupIdValue) : null;
+    if (!id) return;
+    await prisma.place.update({ where: { id }, data: { groupId } });
+    await regenerateThisWeekAssignments();
+    revalidatePath("/admin");
+  }
+
   return (
     <main className="max-w-lg mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">管理画面</h1>
@@ -141,14 +163,31 @@ export default async function AdminPage() {
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
             <li key={m.id} className="flex items-center justify-between px-4 py-2">
-              <span>
-                {m.name}
-                {m.group ? ` (${m.group.name})` : ""}
-              </span>
-              <form action={deleteMember}>
-                <input type="hidden" name="memberId" value={m.id} />
-                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
-              </form>
+              <span>{m.name}</span>
+              <div className="flex gap-2">
+                <form action={updateMemberGroup} className="flex gap-2">
+                  <input type="hidden" name="memberId" value={m.id} />
+                  <select
+                    name="memberGroupId"
+                    defaultValue={m.groupId ?? ""}
+                    className="border px-2 py-1 rounded"
+                  >
+                    <option value="">未割当</option>
+                    {groups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.name}
+                      </option>
+                    ))}
+                  </select>
+                  <SubmitButton type="submit" variant="success">
+                    変更
+                  </SubmitButton>
+                </form>
+                <form action={deleteMember}>
+                  <input type="hidden" name="memberId" value={m.id} />
+                  <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
+                </form>
+              </div>
             </li>
           ))}
         </ul>
@@ -178,14 +217,31 @@ export default async function AdminPage() {
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
             <li key={p.id} className="flex items-center justify-between px-4 py-2">
-              <span>
-                {p.name}
-                {p.group ? ` (${p.group.name})` : ""}
-              </span>
-              <form action={deletePlace}>
-                <input type="hidden" name="placeId" value={p.id} />
-                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
-              </form>
+              <span>{p.name}</span>
+              <div className="flex gap-2">
+                <form action={updatePlaceGroup} className="flex gap-2">
+                  <input type="hidden" name="placeId" value={p.id} />
+                  <select
+                    name="placeGroupId"
+                    defaultValue={p.groupId ?? ""}
+                    className="border px-2 py-1 rounded"
+                  >
+                    <option value="">未割当</option>
+                    {groups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.name}
+                      </option>
+                    ))}
+                  </select>
+                  <SubmitButton type="submit" variant="success">
+                    変更
+                  </SubmitButton>
+                </form>
+                <form action={deletePlace}>
+                  <input type="hidden" name="placeId" value={p.id} />
+                  <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
+                </form>
+              </div>
             </li>
           ))}
         </ul>
