@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { autoRotateIfNeeded } from "@/lib/rotation";
 import { getWeekStart } from "@/lib/week";
 import { updateRotation } from "./actions/rotation";
-import { Button } from "@/components/Button";
+import { SubmitButton } from "@/components/SubmitButton";
 import { format } from "date-fns";
 
 export default async function Home() {
@@ -48,7 +48,7 @@ export default async function Home() {
         週の開始日: {format(weekStart, "yyyy年MM月dd日")}
       </div>
       <form action={updateRotation} className="mb-4">
-        <Button type="submit">ローテーション更新</Button>
+        <SubmitButton type="submit">ローテーション更新</SubmitButton>
       </form>
       {members.length === 0 ? (
         <div className="text-red-500">ユーザーが登録されていません。</div>
