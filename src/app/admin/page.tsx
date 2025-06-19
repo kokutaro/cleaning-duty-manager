@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { regenerateThisWeekAssignments } from "@/lib/rotation";
 import { ConfirmDeleteButton } from "./components/ConfirmDeleteButton";
 import { getWeekStart } from "@/lib/week";
-import { Button } from "@/components/Button";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function AdminPage() {
   const members = await prisma.member.findMany();
@@ -82,7 +82,7 @@ export default async function AdminPage() {
             placeholder="名前"
             required
           />
-          <Button type="submit">追加</Button>
+          <SubmitButton type="submit">追加</SubmitButton>
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
@@ -106,9 +106,9 @@ export default async function AdminPage() {
             placeholder="場所名"
             required
           />
-          <Button variant="success" type="submit">
+          <SubmitButton variant="success" type="submit">
             追加
-          </Button>
+          </SubmitButton>
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
