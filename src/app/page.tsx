@@ -1,6 +1,4 @@
 import { prisma } from "../lib/prisma";
-import { rotateThisWeekFromLastWeek } from "../lib/rotation";
-import { revalidatePath } from "next/cache";
 import { format } from "date-fns";
 
 async function autoRotateIfNeeded(weekStart: Date) {
@@ -65,12 +63,6 @@ async function autoRotateIfNeeded(weekStart: Date) {
     });
   }
 }
-
-async function updateRotation() {
-  "use server";
-  await rotateThisWeekFromLastWeek();
-  revalidatePath("/");
-}
 export default async function Home() {
   // 今週の開始日を算出（例：月曜始まり）
   const now = new Date();
@@ -110,14 +102,6 @@ export default async function Home() {
       <div className="mb-2 text-gray-500">
         週の開始日: {format(weekStart, "yyyy年MM月dd日")}
       </div>
-      <form action={updateRotation} className="mb-4">
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-1 rounded"
-        >
-          ローテーション更新
-        </button>
-      </form>
       {members.length === 0 ? (
         <div className="text-red-500">ユーザーが登録されていません。</div>
       ) : (
