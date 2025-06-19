@@ -36,6 +36,7 @@ export async function regenerateThisWeekAssignments() {
   }
 }
 
+
 export async function advanceCurrentWeekRotation() {
   // 今週の開始日を計算
   const now = new Date();
@@ -48,6 +49,7 @@ export async function advanceCurrentWeekRotation() {
     update: {},
     create: { startDate: weekStart },
   });
+
 
   const places = await prisma.place.findMany({ orderBy: { id: "asc" } });
   const members = await prisma.member.findMany({ orderBy: { id: "asc" } });
