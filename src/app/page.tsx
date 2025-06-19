@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { rotateThisWeekFromLastWeek } from "../lib/rotation";
+import { advanceCurrentWeekRotation } from "../lib/rotation";
 import { revalidatePath } from "next/cache";
 import { format } from "date-fns";
 
@@ -68,7 +68,7 @@ async function autoRotateIfNeeded(weekStart: Date) {
 
 async function updateRotation() {
   "use server";
-  await rotateThisWeekFromLastWeek();
+  await advanceCurrentWeekRotation();
   revalidatePath("/");
 }
 export default async function Home() {
