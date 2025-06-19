@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  assignments DutyAssignment[]
+}
+
+model Place {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  assignments DutyAssignment[]
+}
+
+model Week {
+  id          Int              @id @default(autoincrement())
+  startDate   DateTime         @unique // 週の開始日
+  assignments DutyAssignment[]
+}
+
+model DutyAssignment {
+  id       Int    @id @default(autoincrement())
+  week     Week   @relation(fields: [weekId], references: [id])
+  weekId   Int
+  place    Place  @relation(fields: [placeId], references: [id])
+  placeId  Int
+  member   Member @relation(fields: [memberId], references: [id])
+  memberId Int
+
+  @@unique([weekId, placeId])
+}
