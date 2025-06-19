@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { regenerateThisWeekAssignments } from "@/lib/rotation";
 import { ConfirmDeleteButton } from "./components/ConfirmDeleteButton";
 import { getWeekStart } from "@/lib/week";
+import { Button } from "@/components/Button";
 
 export default async function AdminPage() {
   const members = await prisma.member.findMany();
@@ -81,12 +82,7 @@ export default async function AdminPage() {
             placeholder="名前"
             required
           />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-1 rounded"
-          >
-            追加
-          </button>
+          <Button type="submit">追加</Button>
         </form>
         <ul className="list-disc pl-5">
           {members.map((m) => (
@@ -94,10 +90,7 @@ export default async function AdminPage() {
               {m.name}
               <form action={deleteMember}>
                 <input type="hidden" name="memberId" value={m.id} />
-                <ConfirmDeleteButton
-                  type="submit"
-                  className="ml-2 text-red-400 hover:text-red-600"
-                >
+                <ConfirmDeleteButton type="submit" className="ml-2">
                   削除
                 </ConfirmDeleteButton>
               </form>
@@ -115,12 +108,9 @@ export default async function AdminPage() {
             placeholder="場所名"
             required
           />
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-4 py-1 rounded"
-          >
+          <Button variant="success" type="submit">
             追加
-          </button>
+          </Button>
         </form>
         <ul className="list-disc pl-5">
           {places.map((p) => (
@@ -128,10 +118,7 @@ export default async function AdminPage() {
               {p.name}
               <form action={deletePlace}>
                 <input type="hidden" name="placeId" value={p.id} />
-                <ConfirmDeleteButton
-                  type="submit"
-                  className="ml-2 text-red-400 hover:text-red-600"
-                >
+                <ConfirmDeleteButton type="submit" className="ml-2">
                   削除
                 </ConfirmDeleteButton>
               </form>
