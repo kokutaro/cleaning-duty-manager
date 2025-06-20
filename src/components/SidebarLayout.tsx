@@ -2,9 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { HomeIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
 
   const handleToggle = () => {
     setOpen((prev) => !prev)
@@ -19,12 +22,22 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         className={`fixed md:static inset-y-0 left-0 z-40 w-56 bg-neutral-950 border-r border-neutral-800 flex flex-col p-6 gap-4 shadow-sm transition-transform transform ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <h1 className="text-xl font-bold mb-6 text-neutral-300">お掃除当番管理</h1>
-        <nav className="flex flex-col gap-2">
-          <Link href="/" className="hover:underline text-cyan-400" onClick={handleLinkClick}>
-            トップページ
+        <nav className="flex flex-col gap-1">
+          <Link
+            href="/"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/' ? 'bg-neutral-800 text-white' : ''}`}
+          >
+            <HomeIcon className="w-5 h-5" />
+            <span>トップページ</span>
           </Link>
-          <Link href="/admin" className="hover:underline text-cyan-400" onClick={handleLinkClick}>
-            管理画面
+          <Link
+            href="/admin"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/admin' ? 'bg-neutral-800 text-white' : ''}`}
+          >
+            <Cog6ToothIcon className="w-5 h-5" />
+            <span>管理画面</span>
           </Link>
         </nav>
       </aside>
