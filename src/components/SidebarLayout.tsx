@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HomeIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, Cog6ToothIcon, ClockIcon } from '@heroicons/react/24/outline'
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
@@ -30,6 +30,14 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           >
             <HomeIcon className="w-5 h-5" />
             <span>トップページ</span>
+          </Link>
+          <Link
+            href="/history"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/history' ? 'bg-neutral-800 text-white' : ''}`}
+          >
+            <ClockIcon className="w-5 h-5" />
+            <span>履歴</span>
           </Link>
           <Link
             href="/admin"
