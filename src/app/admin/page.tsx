@@ -132,15 +132,15 @@ export default async function AdminPage() {
   }
 
   return (
-    <main className="max-w-lg mx-auto py-10">
+    <main className="mx-auto w-full max-w-4xl py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">管理画面</h1>
 
       <section className="mb-10">
         <h2 className="text-lg font-semibold mb-2">グループ登録</h2>
-        <form action={addGroup} className="flex gap-2 mb-4">
+        <form action={addGroup} className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             name="groupName"
-            className="border px-2 py-1 rounded"
+            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="グループ名"
             required
           />
@@ -148,7 +148,10 @@ export default async function AdminPage() {
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {groups.map((g) => (
-            <li key={g.id} className="flex items-center justify-between px-4 py-2">
+            <li
+              key={g.id}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-2"
+            >
               <span>{g.name}</span>
               <form action={deleteGroup}>
                 <input type="hidden" name="groupId" value={g.id} />
@@ -161,14 +164,14 @@ export default async function AdminPage() {
 
       <section className="mb-10">
         <h2 className="text-lg font-semibold mb-2">ユーザー登録</h2>
-        <form action={addMember} className="flex gap-2 mb-4">
+        <form action={addMember} className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             name="memberName"
-            className="border px-2 py-1 rounded"
+            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="名前"
             required
           />
-          <select name="memberGroupId" className="border px-2 py-1 rounded">
+          <select name="memberGroupId" className="border px-2 py-1 rounded w-full sm:w-auto">
             <option value="">未割当</option>
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
@@ -180,23 +183,26 @@ export default async function AdminPage() {
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
-            <li key={m.id} className="flex items-center justify-between px-4 py-2">
-              <form action={updateMemberName} className="flex gap-2">
+            <li
+              key={m.id}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-2"
+            >
+              <form action={updateMemberName} className="flex flex-col sm:flex-row gap-2">
                 <input type="hidden" name="memberId" value={m.id} />
                 <input
                   name="memberName"
                   defaultValue={m.name}
-                  className="border px-2 py-1 rounded"
+                  className="border px-2 py-1 rounded w-full sm:w-auto"
                 />
                 <SubmitButton type="submit" variant="success">保存</SubmitButton>
               </form>
-              <div className="flex gap-2">
-                <form action={updateMemberGroup} className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <form action={updateMemberGroup} className="flex flex-col sm:flex-row gap-2">
                   <input type="hidden" name="memberId" value={m.id} />
                   <select
                     name="memberGroupId"
                     defaultValue={m.groupId ?? ""}
-                    className="border px-2 py-1 rounded"
+                    className="border px-2 py-1 rounded w-full sm:w-auto"
                   >
                     <option value="">未割当</option>
                     {groups.map((g) => (
@@ -221,14 +227,14 @@ export default async function AdminPage() {
 
       <section>
         <h2 className="text-lg font-semibold mb-2">掃除場所登録</h2>
-        <form action={addPlace} className="flex gap-2 mb-4">
+        <form action={addPlace} className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             name="placeName"
-            className="border px-2 py-1 rounded"
+            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="場所名"
             required
           />
-          <select name="placeGroupId" className="border px-2 py-1 rounded">
+          <select name="placeGroupId" className="border px-2 py-1 rounded w-full sm:w-auto">
             <option value="">未割当</option>
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
@@ -242,23 +248,26 @@ export default async function AdminPage() {
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
-            <li key={p.id} className="flex items-center justify-between px-4 py-2">
-              <form action={updatePlaceName} className="flex gap-2">
+            <li
+              key={p.id}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 py-2"
+            >
+              <form action={updatePlaceName} className="flex flex-col sm:flex-row gap-2">
                 <input type="hidden" name="placeId" value={p.id} />
                 <input
                   name="placeName"
                   defaultValue={p.name}
-                  className="border px-2 py-1 rounded"
+                  className="border px-2 py-1 rounded w-full sm:w-auto"
                 />
                 <SubmitButton type="submit" variant="success">保存</SubmitButton>
               </form>
-              <div className="flex gap-2">
-                <form action={updatePlaceGroup} className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <form action={updatePlaceGroup} className="flex flex-col sm:flex-row gap-2">
                   <input type="hidden" name="placeId" value={p.id} />
                   <select
                     name="placeGroupId"
                     defaultValue={p.groupId ?? ""}
-                    className="border px-2 py-1 rounded"
+                    className="border px-2 py-1 rounded w-full sm:w-auto"
                   >
                     <option value="">未割当</option>
                     {groups.map((g) => (
