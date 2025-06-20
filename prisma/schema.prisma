@@ -17,7 +17,7 @@ model Member {
 
 model Place {
   id          Int              @id @default(autoincrement())
-  name        String           @unique
+  name        String
   group       Group?           @relation(fields: [groupId], references: [id])
   groupId     Int?
   assignments DutyAssignment[]
