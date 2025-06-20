@@ -74,6 +74,24 @@ export default async function AdminPage() {
     revalidatePath("/admin");
   }
 
+  async function updateMemberName(formData: FormData) {
+    "use server";
+    const id = Number(formData.get("memberId"));
+    const name = formData.get("memberName") as string;
+    if (!id || !name) return;
+    await prisma.member.update({ where: { id }, data: { name } });
+    revalidatePath("/admin");
+  }
+
+  async function updatePlaceName(formData: FormData) {
+    "use server";
+    const id = Number(formData.get("placeId"));
+    const name = formData.get("placeName") as string;
+    if (!id || !name) return;
+    await prisma.place.update({ where: { id }, data: { name } });
+    revalidatePath("/admin");
+  }
+
   async function addGroup(formData: FormData) {
     "use server";
     const name = formData.get("groupName") as string;
@@ -163,7 +181,15 @@ export default async function AdminPage() {
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {members.map((m) => (
             <li key={m.id} className="flex items-center justify-between px-4 py-2">
-              <span>{m.name}</span>
+              <form action={updateMemberName} className="flex gap-2">
+                <input type="hidden" name="memberId" value={m.id} />
+                <input
+                  name="memberName"
+                  defaultValue={m.name}
+                  className="border px-2 py-1 rounded"
+                />
+                <SubmitButton type="submit" variant="success">保存</SubmitButton>
+              </form>
               <div className="flex gap-2">
                 <form action={updateMemberGroup} className="flex gap-2">
                   <input type="hidden" name="memberId" value={m.id} />
@@ -217,7 +243,15 @@ export default async function AdminPage() {
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
           {places.map((p) => (
             <li key={p.id} className="flex items-center justify-between px-4 py-2">
-              <span>{p.name}</span>
+              <form action={updatePlaceName} className="flex gap-2">
+                <input type="hidden" name="placeId" value={p.id} />
+                <input
+                  name="placeName"
+                  defaultValue={p.name}
+                  className="border px-2 py-1 rounded"
+                />
+                <SubmitButton type="submit" variant="success">保存</SubmitButton>
+              </form>
               <div className="flex gap-2">
                 <form action={updatePlaceGroup} className="flex gap-2">
                   <input type="hidden" name="placeId" value={p.id} />
