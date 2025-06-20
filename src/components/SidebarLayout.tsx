@@ -5,6 +5,14 @@ import Link from 'next/link'
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+
+  const handleToggle = () => {
+    setOpen((prev) => !prev)
+  }
+
+  const handleLinkClick = () => {
+    setOpen(false)
+  }
   return (
     <div className="min-h-screen flex overflow-x-hidden relative">
       <aside
@@ -12,10 +20,10 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
       >
         <h1 className="text-xl font-bold mb-6 text-neutral-300">お掃除当番管理</h1>
         <nav className="flex flex-col gap-2">
-          <Link href="/" className="hover:underline text-cyan-400">
+          <Link href="/" className="hover:underline text-cyan-400" onClick={handleLinkClick}>
             トップページ
           </Link>
-          <Link href="/admin" className="hover:underline text-cyan-400">
+          <Link href="/admin" className="hover:underline text-cyan-400" onClick={handleLinkClick}>
             管理画面
           </Link>
         </nav>
@@ -27,8 +35,8 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         />
       )}
       <button
-        onClick={() => setOpen(true)}
-        className="md:hidden p-2 fixed top-4 left-4 z-50 bg-neutral-800 rounded"
+        onClick={handleToggle}
+        className={`md:hidden p-2 fixed top-4 left-4 z-50 bg-neutral-800 rounded transition-transform transform ${open ? 'translate-x-56' : ''}`}
         aria-label="メニュー"
       >
         <svg
