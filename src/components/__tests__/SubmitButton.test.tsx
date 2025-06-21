@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { MantineProvider } from '@mantine/core';
 import { vi, expect, test } from 'vitest';
 import { SubmitButton } from '../SubmitButton';
 
@@ -11,12 +12,20 @@ vi.mock('react-dom', async () => {
 const { useFormStatus } = await import('react-dom');
 
 test('renders children', () => {
-  const { getByText } = render(<SubmitButton>Send</SubmitButton>);
+  const { getByText } = render(
+    <MantineProvider>
+      <SubmitButton>Send</SubmitButton>
+    </MantineProvider>
+  );
   expect(getByText('Send')).toBeTruthy();
 });
 
 test('shows spinner when pending', () => {
   (useFormStatus as unknown as vi.Mock).mockReturnValueOnce({ pending: true });
-  const { container } = render(<SubmitButton>Send</SubmitButton>);
+  const { container } = render(
+    <MantineProvider>
+      <SubmitButton>Send</SubmitButton>
+    </MantineProvider>
+  );
   expect(container.querySelector('svg')).toBeTruthy();
 });

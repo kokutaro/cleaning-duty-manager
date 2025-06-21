@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { AppShell, Burger, Group, Stack } from '@mantine/core'
 import { HomeIcon, Cog6ToothIcon, ClockIcon } from '@heroicons/react/24/outline'
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
@@ -17,67 +18,54 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
     setOpen(false)
   }
   return (
-    <div className="min-h-screen flex overflow-x-hidden relative">
-      <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-56 bg-neutral-950 border-r border-neutral-800 flex flex-col p-6 gap-4 shadow-sm transition-transform transform ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-      >
-        <h1 className="text-xl font-bold mb-6 text-neutral-300">お掃除当番管理</h1>
-        <nav className="flex flex-col gap-1">
+    <AppShell
+      padding="md"
+      navbar={{ width: 220, breakpoint: 'sm', collapsed: { mobile: !open } }}
+      header={{ height: 60 }}
+    >
+      <AppShell.Header>
+        <Group h="100%" px="md">
+          <Burger opened={open} onClick={handleToggle} hiddenFrom="sm" size="sm" />
+          <h1 className="text-xl font-bold">お掃除当番管理</h1>
+        </Group>
+      </AppShell.Header>
+      <AppShell.Navbar p="md">
+        <Stack>
           <Link
             href="/"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/' ? 'bg-neutral-800 text-white' : ''}`}
+            data-active={pathname === '/'}
           >
-            <HomeIcon className="w-5 h-5" />
-            <span>トップページ</span>
+            <Group gap="sm">
+              <HomeIcon className="w-5 h-5" />
+              <span>トップページ</span>
+            </Group>
           </Link>
           <Link
             href="/history"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/history' ? 'bg-neutral-800 text-white' : ''}`}
+            data-active={pathname === '/history'}
           >
-            <ClockIcon className="w-5 h-5" />
-            <span>履歴</span>
+            <Group gap="sm">
+              <ClockIcon className="w-5 h-5" />
+              <span>履歴</span>
+            </Group>
           </Link>
           <Link
             href="/admin"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-300 hover:bg-neutral-800 hover:text-white ${pathname === '/admin' ? 'bg-neutral-800 text-white' : ''}`}
+            data-active={pathname === '/admin'}
           >
-            <Cog6ToothIcon className="w-5 h-5" />
-            <span>管理画面</span>
+            <Group gap="sm">
+              <Cog6ToothIcon className="w-5 h-5" />
+              <span>管理画面</span>
+            </Group>
           </Link>
-        </nav>
-      </aside>
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-      <button
-        onClick={handleToggle}
-        className={`md:hidden p-2 fixed top-4 left-4 z-50 bg-neutral-800 rounded transition-transform transform ${open ? 'translate-x-56' : ''}`}
-        aria-label="メニュー"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6 text-white"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-      </button>
-      <main className="flex-1 p-8 bg-neutral-900 text-neutral-100 min-h-screen flex flex-col items-center justify-center">
+        </Stack>
+      </AppShell.Navbar>
+      <AppShell.Main className="min-h-screen flex flex-col items-center justify-center">
         {children}
-      </main>
-    </div>
+      </AppShell.Main>
+    </AppShell>
   )
 }
