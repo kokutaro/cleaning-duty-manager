@@ -1,22 +1,31 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import { vi, expect, test } from 'vitest';
-import { SubmitButton } from '../SubmitButton';
+import React from "react";
+import { render } from "@testing-library/react";
+import { MantineProvider } from "@mantine/core";
+import { vi, expect, test, type Mock } from "vitest";
+import { SubmitButton } from "../SubmitButton";
 
-vi.mock('react-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-dom')>('react-dom');
+vi.mock("react-dom", async () => {
+  const actual = await vi.importActual<typeof import("react-dom")>("react-dom");
   return { ...actual, useFormStatus: vi.fn(() => ({ pending: false })) };
 });
 
-const { useFormStatus } = await import('react-dom');
+const { useFormStatus } = await import("react-dom");
 
-test('renders children', () => {
-  const { getByText } = render(<SubmitButton>Send</SubmitButton>);
-  expect(getByText('Send')).toBeTruthy();
+test("renders children", () => {
+  const { getByText } = render(
+    <MantineProvider>
+      <SubmitButton>Send</SubmitButton>
+    </MantineProvider>,
+  );
+  expect(getByText("Send")).toBeTruthy();
 });
 
-test('shows spinner when pending', () => {
-  (useFormStatus as unknown as vi.Mock).mockReturnValueOnce({ pending: true });
-  const { container } = render(<SubmitButton>Send</SubmitButton>);
-  expect(container.querySelector('svg')).toBeTruthy();
+test("shows spinner when pending", () => {
+  (useFormStatus as unknown as Mock).mockReturnValueOnce({ pending: true });
+  const { container } = render(
+    <MantineProvider>
+      <SubmitButton>Send</SubmitButton>
+    </MantineProvider>,
+  );
+  expect(container.querySelector("svg")).toBeTruthy();
 });

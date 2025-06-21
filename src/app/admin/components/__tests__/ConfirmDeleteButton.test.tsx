@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent, cleanup } from '@testing-library/react';
+import { MantineProvider } from '@mantine/core';
 import { ConfirmDeleteButton } from '../ConfirmDeleteButton';
 import { vi, expect, test, afterEach } from 'vitest';
 
@@ -9,7 +10,11 @@ afterEach(() => {
 
 test('calls confirm on click', () => {
   const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-  const { getByText } = render(<ConfirmDeleteButton>Delete</ConfirmDeleteButton>);
+  const { getByText } = render(
+    <MantineProvider>
+      <ConfirmDeleteButton>Delete</ConfirmDeleteButton>
+    </MantineProvider>
+  );
   fireEvent.click(getByText('Delete'));
   expect(confirmSpy).toHaveBeenCalled();
   confirmSpy.mockRestore();
@@ -17,7 +22,11 @@ test('calls confirm on click', () => {
 
 test('prevents default when canceled', () => {
   const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-  const { getByText } = render(<ConfirmDeleteButton>Delete</ConfirmDeleteButton>);
+  const { getByText } = render(
+    <MantineProvider>
+      <ConfirmDeleteButton>Delete</ConfirmDeleteButton>
+    </MantineProvider>
+  );
   const button = getByText('Delete');
   const event = new MouseEvent('click', { bubbles: true, cancelable: true });
   const pd = vi.fn();
