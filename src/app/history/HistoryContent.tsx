@@ -19,6 +19,18 @@ export async function HistoryContent() {
       a.placeName.localeCompare(b.placeName)
   );
 
+  const members = Array.from(
+    new Set(countList.map((c) => c.memberName))
+  ).sort((a, b) => a.localeCompare(b));
+  const places = Array.from(
+    new Set(countList.map((c) => c.placeName))
+  ).sort((a, b) => a.localeCompare(b));
+  const matrix: Record<string, Record<string, number>> = {};
+  for (const c of countList) {
+    if (!matrix[c.memberName]) matrix[c.memberName] = {};
+    matrix[c.memberName][c.placeName] = c.count;
+  }
+
   return (
     <>
       <section>
@@ -45,17 +57,29 @@ export async function HistoryContent() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
-              <th className="border-b border-neutral-700 p-2">メンバー</th>
-              <th className="border-b border-neutral-700 p-2">場所</th>
-              <th className="border-b border-neutral-700 p-2 text-right">回数</th>
+              <th className="border-b border-neutral-700 p-2">メンバー\場所</th>
+              {places.map((p) => (
+                <th
+                  key={p}
+                  className="border-b border-neutral-700 p-2 text-right"
+                >
+                  {p}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {countList.map((c, idx) => (
-              <tr key={idx}>
-                <td className="border-b border-neutral-800 p-2">{c.memberName}</td>
-                <td className="border-b border-neutral-800 p-2">{c.placeName}</td>
-                <td className="border-b border-neutral-800 p-2 text-right">{c.count}</td>
+            {members.map((m) => (
+              <tr key={m}>
+                <th className="border-b border-neutral-800 p-2">{m}</th>
+                {places.map((p) => (
+                  <td
+                    key={p}
+                    className="border-b border-neutral-800 p-2 text-right"
+                  >
+                    {matrix[m]?.[p] ?? 0}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
