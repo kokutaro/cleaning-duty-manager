@@ -19,6 +19,7 @@ export default async function AdminPage() {
       await prisma.member.create({ data: { name, groupId } });
       await regenerateThisWeekAssignments();
       revalidatePath("/admin");
+      revalidatePath("/");
     }
   }
 
@@ -31,6 +32,7 @@ export default async function AdminPage() {
       await prisma.place.create({ data: { name, groupId } });
       await regenerateThisWeekAssignments();
       revalidatePath("/admin");
+      revalidatePath("/");
     }
   }
 
@@ -52,6 +54,7 @@ export default async function AdminPage() {
       await regenerateThisWeekAssignments();
     }
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function deletePlace(formData: FormData) {
@@ -72,6 +75,7 @@ export default async function AdminPage() {
       await regenerateThisWeekAssignments();
     }
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function updateMemberName(formData: FormData) {
@@ -81,6 +85,7 @@ export default async function AdminPage() {
     if (!id || !name) return;
     await prisma.member.update({ where: { id }, data: { name } });
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function updatePlaceName(formData: FormData) {
@@ -90,6 +95,7 @@ export default async function AdminPage() {
     if (!id || !name) return;
     await prisma.place.update({ where: { id }, data: { name } });
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function addGroup(formData: FormData) {
@@ -98,6 +104,7 @@ export default async function AdminPage() {
     if (name) {
       await prisma.group.create({ data: { name } });
       revalidatePath("/admin");
+      revalidatePath("/");
     }
   }
 
@@ -107,6 +114,7 @@ export default async function AdminPage() {
     if (!id) return;
     await prisma.group.delete({ where: { id } });
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function updateMemberGroup(formData: FormData) {
@@ -118,6 +126,7 @@ export default async function AdminPage() {
     await prisma.member.update({ where: { id }, data: { groupId } });
     await regenerateThisWeekAssignments();
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   async function updatePlaceGroup(formData: FormData) {
@@ -129,6 +138,7 @@ export default async function AdminPage() {
     await prisma.place.update({ where: { id }, data: { groupId } });
     await regenerateThisWeekAssignments();
     revalidatePath("/admin");
+    revalidatePath("/");
   }
 
   return (
