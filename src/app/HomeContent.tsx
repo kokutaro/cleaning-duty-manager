@@ -71,14 +71,14 @@ export async function HomeContent() {
                   {g.places.map(({ place, member }) => (
                     <div
                       key={place.id}
-                      className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4"
+                      className="w-full sm:w-48 border rounded-md p-4 bg-neutral-100 dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700"
                     >
                       <h3 className="text-lg font-semibold mb-2">{place.name}</h3>
                       <p>{member ? member.name : "未割当"}</p>
                     </div>
                   ))}
                   {g.noneMembers.length > 0 && (
-                    <div className="w-full sm:w-48 border border-neutral-700 rounded-md bg-neutral-800 p-4">
+                    <div className="w-full sm:w-48 border rounded-md p-4 bg-neutral-100 dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700">
                       <h3 className="text-lg font-semibold mb-2">なし</h3>
                       <ul className="list-disc list-inside">
                         {g.noneMembers.map((m) => (
