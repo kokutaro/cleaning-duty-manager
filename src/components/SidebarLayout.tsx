@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AppShell, Burger, Group, Stack } from "@mantine/core";
+import { ThemeToggle } from "./ThemeToggle";
 import {
   HomeIcon,
   Cog6ToothIcon,
@@ -36,6 +37,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
             size="sm"
           />
           <h1 className="text-xl font-bold">お掃除当番管理</h1>
+          <ThemeToggle />
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
