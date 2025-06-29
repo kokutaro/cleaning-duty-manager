@@ -1,7 +1,15 @@
-import { prisma } from '@/lib/prisma'
 import { getAssignmentCounts } from '@/lib/history'
+import { prisma } from '@/lib/prisma'
+import {
+  Card,
+  Table,
+  TableTbody,
+  TableTd,
+  TableTh,
+  TableThead,
+  TableTr,
+} from '@mantine/core'
 import { format } from 'date-fns'
-import { Table, Card } from '@mantine/core'
 
 export async function HistoryContent() {
   const weeks = await prisma.week.findMany({
@@ -56,28 +64,28 @@ export async function HistoryContent() {
       <section>
         <h2 className="text-xl font-bold mb-4">掃除回数集計</h2>
         <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>メンバー\場所</Table.Th>
+          <TableThead>
+            <TableTr>
+              <TableTh>メンバー\場所</TableTh>
               {places.map(p => (
-                <Table.Th key={p} style={{ textAlign: 'right' }}>
+                <TableTh key={p} style={{ textAlign: 'right' }}>
                   {p}
-                </Table.Th>
+                </TableTh>
               ))}
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
+            </TableTr>
+          </TableThead>
+          <TableTbody>
             {members.map(m => (
-              <Table.Tr key={m}>
-                <Table.Th>{m}</Table.Th>
+              <TableTr key={m}>
+                <TableTh>{m}</TableTh>
                 {places.map(p => (
-                  <Table.Td key={p} style={{ textAlign: 'right' }}>
+                  <TableTd key={p} style={{ textAlign: 'right' }}>
                     {matrix[m]?.[p] ?? 0}
-                  </Table.Td>
+                  </TableTd>
                 ))}
-              </Table.Tr>
+              </TableTr>
             ))}
-          </Table.Tbody>
+          </TableTbody>
         </Table>
       </section>
     </>
