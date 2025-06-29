@@ -3,7 +3,7 @@ import { autoRotateIfNeeded } from '@/lib/rotation'
 import { getWeekStart } from '@/lib/week'
 import { updateRotation } from './actions/rotation'
 import { SubmitButton } from '@/components/SubmitButton'
-import { Paper } from '@mantine/core'
+import { Paper, Text } from '@mantine/core'
 import { format } from 'date-fns'
 
 export async function HomeContent() {
@@ -54,14 +54,14 @@ export async function HomeContent() {
   return (
     <>
       <h1 className="text-2xl font-bold mb-6">今週のお掃除当番</h1>
-      <div className="mb-2 text-gray-500">
+      <Text size="sm" c="dimmed" className="mb-2">
         週の開始日: {format(weekStart, 'yyyy年MM月dd日')}
-      </div>
+      </Text>
       <form action={updateRotation} className="mb-4">
         <SubmitButton type="submit">ローテーション更新</SubmitButton>
       </form>
       {members.length === 0 ? (
-        <div className="text-red-500">ユーザーが登録されていません。</div>
+        <Text c="red">ユーザーが登録されていません。</Text>
       ) : (
         <>
           <div className="flex flex-col gap-8">

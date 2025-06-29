@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { AppShell, Burger, Group, Stack } from '@mantine/core'
+import { AppShell, Burger, Group, Stack, NavLink } from '@mantine/core'
 import { ThemeToggle } from './ThemeToggle'
 import { HomeIcon, Cog6ToothIcon, ClockIcon } from '@heroicons/react/24/outline'
 
@@ -38,39 +38,30 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
       </AppShell.Header>
       <AppShell.Navbar p="md">
         <Stack>
-          <Link
+          <NavLink
+            component={Link}
             href="/"
             onClick={handleLinkClick}
-            data-active={pathname === '/'}
-            className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
-          >
-            <Group gap="sm">
-              <HomeIcon className="w-5 h-5" />
-              <span>トップページ</span>
-            </Group>
-          </Link>
-          <Link
+            active={pathname === '/'}
+            label="トップページ"
+            leftSection={<HomeIcon className="w-5 h-5" />}
+          />
+          <NavLink
+            component={Link}
             href="/history"
             onClick={handleLinkClick}
-            data-active={pathname === '/history'}
-            className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
-          >
-            <Group gap="sm">
-              <ClockIcon className="w-5 h-5" />
-              <span>履歴</span>
-            </Group>
-          </Link>
-          <Link
+            active={pathname === '/history'}
+            label="履歴"
+            leftSection={<ClockIcon className="w-5 h-5" />}
+          />
+          <NavLink
+            component={Link}
             href="/admin"
             onClick={handleLinkClick}
-            data-active={pathname === '/admin'}
-            className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
-          >
-            <Group gap="sm">
-              <Cog6ToothIcon className="w-5 h-5" />
-              <span>管理画面</span>
-            </Group>
-          </Link>
+            active={pathname === '/admin'}
+            label="管理画面"
+            leftSection={<Cog6ToothIcon className="w-5 h-5" />}
+          />
         </Stack>
       </AppShell.Navbar>
       <AppShell.Main className="min-h-screen flex flex-col items-center justify-center">
