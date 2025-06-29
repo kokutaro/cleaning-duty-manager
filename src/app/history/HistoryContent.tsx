@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { getAssignmentCounts } from '@/lib/history'
 import { format } from 'date-fns'
+import { Table, Card } from '@mantine/core'
 
 export async function HistoryContent() {
   const weeks = await prisma.week.findMany({
@@ -37,10 +38,7 @@ export async function HistoryContent() {
         <h1 className="text-2xl font-bold mb-6">アサイン履歴</h1>
         <div className="flex flex-col gap-8">
           {weeks.map(w => (
-            <div
-              key={w.id}
-              className="border border-neutral-700 rounded-md p-4"
-            >
+            <Card key={w.id} withBorder padding="md" radius="md">
               <h2 className="text-xl font-semibold mb-2">
                 {format(w.startDate, 'yyyy年MM月dd日')}
               </h2>
@@ -51,42 +49,36 @@ export async function HistoryContent() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Card>
           ))}
         </div>
       </section>
       <section>
         <h2 className="text-xl font-bold mb-4">掃除回数集計</h2>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr>
-              <th className="border-b border-neutral-700 p-2">メンバー\場所</th>
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>メンバー\場所</Table.Th>
               {places.map(p => (
-                <th
-                  key={p}
-                  className="border-b border-neutral-700 p-2 text-right"
-                >
+                <Table.Th key={p} style={{ textAlign: 'right' }}>
                   {p}
-                </th>
+                </Table.Th>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {members.map(m => (
-              <tr key={m}>
-                <th className="border-b border-neutral-800 p-2">{m}</th>
+              <Table.Tr key={m}>
+                <Table.Th>{m}</Table.Th>
                 {places.map(p => (
-                  <td
-                    key={p}
-                    className="border-b border-neutral-800 p-2 text-right"
-                  >
+                  <Table.Td key={p} style={{ textAlign: 'right' }}>
                     {matrix[m]?.[p] ?? 0}
-                  </td>
+                  </Table.Td>
                 ))}
-              </tr>
+              </Table.Tr>
             ))}
-          </tbody>
-        </table>
+          </Table.Tbody>
+        </Table>
       </section>
     </>
   )
