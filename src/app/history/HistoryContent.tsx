@@ -56,28 +56,28 @@ export async function HistoryContent() {
       <section>
         <h2 className="text-xl font-bold mb-4">掃除回数集計</h2>
         <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>メンバー\場所</Table.Th>
+          <thead>
+            <tr>
+              <th>メンバー\場所</th>
               {places.map(p => (
-                <Table.Th key={p} style={{ textAlign: 'right' }}>
+                <th key={p} style={{ textAlign: 'right' }}>
                   {p}
-                </Table.Th>
+                </th>
               ))}
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
+            </tr>
+          </thead>
+          <tbody>
             {members.map(m => (
-              <Table.Tr key={m}>
-                <Table.Th>{m}</Table.Th>
+              <tr key={m}>
+                <th>{m}</th>
                 {places.map(p => (
-                  <Table.Td key={p} style={{ textAlign: 'right' }}>
+                  <td key={p} style={{ textAlign: 'right' }}>
                     {matrix[m]?.[p] ?? 0}
-                  </Table.Td>
+                  </td>
                 ))}
-              </Table.Tr>
+              </tr>
             ))}
-          </Table.Tbody>
+          </tbody>
         </Table>
       </section>
     </>
