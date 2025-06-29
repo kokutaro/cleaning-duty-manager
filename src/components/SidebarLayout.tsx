@@ -1,31 +1,27 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { AppShell, Burger, Group, Stack } from "@mantine/core";
-import { ThemeToggle } from "./ThemeToggle";
-import {
-  HomeIcon,
-  Cog6ToothIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
+import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { AppShell, Burger, Group, Stack } from '@mantine/core'
+import { ThemeToggle } from './ThemeToggle'
+import { HomeIcon, Cog6ToothIcon, ClockIcon } from '@heroicons/react/24/outline'
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  const [open, setOpen] = useState(false)
+  const pathname = usePathname()
 
   const handleToggle = () => {
-    setOpen((prev) => !prev);
-  };
+    setOpen(prev => !prev)
+  }
 
   const handleLinkClick = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
   return (
     <AppShell
       padding="md"
-      navbar={{ width: 220, breakpoint: "sm", collapsed: { mobile: !open } }}
+      navbar={{ width: 220, breakpoint: 'sm', collapsed: { mobile: !open } }}
       header={{ height: 60 }}
     >
       <AppShell.Header>
@@ -45,7 +41,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           <Link
             href="/"
             onClick={handleLinkClick}
-            data-active={pathname === "/"}
+            data-active={pathname === '/'}
             className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
           >
             <Group gap="sm">
@@ -56,7 +52,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           <Link
             href="/history"
             onClick={handleLinkClick}
-            data-active={pathname === "/history"}
+            data-active={pathname === '/history'}
             className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
           >
             <Group gap="sm">
@@ -67,7 +63,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           <Link
             href="/admin"
             onClick={handleLinkClick}
-            data-active={pathname === "/admin"}
+            data-active={pathname === '/admin'}
             className="transition-colors text-neutral-300 hover:text-blue-400 data-[active=true]:text-blue-500"
           >
             <Group gap="sm">
@@ -81,5 +77,5 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         {children}
       </AppShell.Main>
     </AppShell>
-  );
+  )
 }

@@ -1,7 +1,11 @@
 'use client'
 import React from 'react'
 
-export function Spinner({ className = 'h-4 w-4 mr-2 text-white' }: { className?: string }) {
+export function Spinner({
+  className = 'h-4 w-4 mr-2 text-white',
+}: {
+  className?: string
+}) {
   return (
     <svg
       className={`animate-spin ${className}`}
