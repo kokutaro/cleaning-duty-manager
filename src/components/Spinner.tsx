@@ -10,7 +10,7 @@ export interface SpinnerProps {
 
 export function Spinner({
   size = 16,
-  color = 'white',
+  color = 'blue',
   className = 'mr-2',
 }: SpinnerProps) {
   return <Loader size={size} color={color} className={className} />

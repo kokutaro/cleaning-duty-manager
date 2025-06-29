@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { ConfirmDeleteButton } from './components/ConfirmDeleteButton'
 import { SubmitButton } from '@/components/SubmitButton'
-import { TextInput, Select, Group, Stack } from '@mantine/core'
+import { TextInput, Select, Group, Stack, Paper, Divider } from '@mantine/core'
 import {
   addMember,
   deleteMember,
@@ -38,24 +38,24 @@ export default async function AdminPage() {
             <SubmitButton type="submit">追加</SubmitButton>
           </Group>
         </form>
-        <Stack
-          gap="xs"
-          className="border border-gray-300 dark:border-gray-700 rounded-md"
-        >
-          {groups.map(g => (
-            <Group
-              key={g.id}
-              justify="space-between"
-              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
-            >
-              <span>{g.name}</span>
-              <form action={deleteGroup}>
-                <input type="hidden" name="groupId" value={g.id} />
-                <ConfirmDeleteButton type="submit">削除</ConfirmDeleteButton>
-              </form>
-            </Group>
-          ))}
-        </Stack>
+        <Paper withBorder radius="md">
+          <Stack gap="xs">
+            {groups.map((g, index) => (
+              <div key={g.id}>
+                <Group justify="space-between" className="px-4 py-2">
+                  <span>{g.name}</span>
+                  <form action={deleteGroup}>
+                    <input type="hidden" name="groupId" value={g.id} />
+                    <ConfirmDeleteButton type="submit">
+                      削除
+                    </ConfirmDeleteButton>
+                  </form>
+                </Group>
+                {index < groups.length - 1 && <Divider />}
+              </div>
+            ))}
+          </Stack>
+        </Paper>
       </section>
 
       <section className="mb-10">
@@ -81,62 +81,61 @@ export default async function AdminPage() {
             <SubmitButton type="submit">追加</SubmitButton>
           </Group>
         </form>
-        <Stack
-          gap="xs"
-          className="border border-gray-300 dark:border-gray-700 rounded-md"
-        >
-          {members.map(m => (
-            <div
-              key={m.id}
-              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
-            >
-              <Group justify="space-between" wrap="wrap">
-                <form action={updateMemberName}>
-                  <Group>
-                    <input type="hidden" name="memberId" value={m.id} />
-                    <TextInput
-                      name="memberName"
-                      defaultValue={m.name}
-                      style={{ minWidth: 150 }}
-                    />
-                    <SubmitButton type="submit" variant="success">
-                      保存
-                    </SubmitButton>
-                  </Group>
-                </form>
-                <Group>
-                  <form action={updateMemberGroup}>
+        <Paper withBorder radius="md">
+          <Stack gap="xs">
+            {members.map((m, index) => (
+              <div key={m.id}>
+                <div className="px-4 py-2">
+                  <Group justify="space-between" wrap="wrap">
+                    <form action={updateMemberName}>
+                      <Group>
+                        <input type="hidden" name="memberId" value={m.id} />
+                        <TextInput
+                          name="memberName"
+                          defaultValue={m.name}
+                          style={{ minWidth: 150 }}
+                        />
+                        <SubmitButton type="submit" variant="success">
+                          保存
+                        </SubmitButton>
+                      </Group>
+                    </form>
                     <Group>
-                      <input type="hidden" name="memberId" value={m.id} />
-                      <Select
-                        name="memberGroupId"
-                        defaultValue={m.groupId?.toString() ?? ''}
-                        data={[
-                          { value: '', label: '未割当' },
-                          ...groups.map(g => ({
-                            value: g.id.toString(),
-                            label: g.name,
-                          })),
-                        ]}
-                        style={{ minWidth: 120 }}
-                        clearable
-                      />
-                      <SubmitButton type="submit" variant="success">
-                        変更
-                      </SubmitButton>
+                      <form action={updateMemberGroup}>
+                        <Group>
+                          <input type="hidden" name="memberId" value={m.id} />
+                          <Select
+                            name="memberGroupId"
+                            defaultValue={m.groupId?.toString() ?? ''}
+                            data={[
+                              { value: '', label: '未割当' },
+                              ...groups.map(g => ({
+                                value: g.id.toString(),
+                                label: g.name,
+                              })),
+                            ]}
+                            style={{ minWidth: 120 }}
+                            clearable
+                          />
+                          <SubmitButton type="submit" variant="success">
+                            変更
+                          </SubmitButton>
+                        </Group>
+                      </form>
+                      <form action={deleteMember}>
+                        <input type="hidden" name="memberId" value={m.id} />
+                        <ConfirmDeleteButton type="submit">
+                          削除
+                        </ConfirmDeleteButton>
+                      </form>
                     </Group>
-                  </form>
-                  <form action={deleteMember}>
-                    <input type="hidden" name="memberId" value={m.id} />
-                    <ConfirmDeleteButton type="submit">
-                      削除
-                    </ConfirmDeleteButton>
-                  </form>
-                </Group>
-              </Group>
-            </div>
-          ))}
-        </Stack>
+                  </Group>
+                </div>
+                {index < members.length - 1 && <Divider />}
+              </div>
+            ))}
+          </Stack>
+        </Paper>
       </section>
 
       <section>
@@ -164,62 +163,61 @@ export default async function AdminPage() {
             </SubmitButton>
           </Group>
         </form>
-        <Stack
-          gap="xs"
-          className="border border-gray-300 dark:border-gray-700 rounded-md"
-        >
-          {places.map(p => (
-            <div
-              key={p.id}
-              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
-            >
-              <Group justify="space-between" wrap="wrap">
-                <form action={updatePlaceName}>
-                  <Group>
-                    <input type="hidden" name="placeId" value={p.id} />
-                    <TextInput
-                      name="placeName"
-                      defaultValue={p.name}
-                      style={{ minWidth: 150 }}
-                    />
-                    <SubmitButton type="submit" variant="success">
-                      保存
-                    </SubmitButton>
-                  </Group>
-                </form>
-                <Group>
-                  <form action={updatePlaceGroup}>
+        <Paper withBorder radius="md">
+          <Stack gap="xs">
+            {places.map((p, index) => (
+              <div key={p.id}>
+                <div className="px-4 py-2">
+                  <Group justify="space-between" wrap="wrap">
+                    <form action={updatePlaceName}>
+                      <Group>
+                        <input type="hidden" name="placeId" value={p.id} />
+                        <TextInput
+                          name="placeName"
+                          defaultValue={p.name}
+                          style={{ minWidth: 150 }}
+                        />
+                        <SubmitButton type="submit" variant="success">
+                          保存
+                        </SubmitButton>
+                      </Group>
+                    </form>
                     <Group>
-                      <input type="hidden" name="placeId" value={p.id} />
-                      <Select
-                        name="placeGroupId"
-                        defaultValue={p.groupId?.toString() ?? ''}
-                        data={[
-                          { value: '', label: '未割当' },
-                          ...groups.map(g => ({
-                            value: g.id.toString(),
-                            label: g.name,
-                          })),
-                        ]}
-                        style={{ minWidth: 120 }}
-                        clearable
-                      />
-                      <SubmitButton type="submit" variant="success">
-                        変更
-                      </SubmitButton>
+                      <form action={updatePlaceGroup}>
+                        <Group>
+                          <input type="hidden" name="placeId" value={p.id} />
+                          <Select
+                            name="placeGroupId"
+                            defaultValue={p.groupId?.toString() ?? ''}
+                            data={[
+                              { value: '', label: '未割当' },
+                              ...groups.map(g => ({
+                                value: g.id.toString(),
+                                label: g.name,
+                              })),
+                            ]}
+                            style={{ minWidth: 120 }}
+                            clearable
+                          />
+                          <SubmitButton type="submit" variant="success">
+                            変更
+                          </SubmitButton>
+                        </Group>
+                      </form>
+                      <form action={deletePlace}>
+                        <input type="hidden" name="placeId" value={p.id} />
+                        <ConfirmDeleteButton type="submit">
+                          削除
+                        </ConfirmDeleteButton>
+                      </form>
                     </Group>
-                  </form>
-                  <form action={deletePlace}>
-                    <input type="hidden" name="placeId" value={p.id} />
-                    <ConfirmDeleteButton type="submit">
-                      削除
-                    </ConfirmDeleteButton>
-                  </form>
-                </Group>
-              </Group>
-            </div>
-          ))}
-        </Stack>
+                  </Group>
+                </div>
+                {index < places.length - 1 && <Divider />}
+              </div>
+            ))}
+          </Stack>
+        </Paper>
       </section>
     </main>
   )

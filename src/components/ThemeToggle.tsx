@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { useMantineColorScheme, SegmentedControl } from '@mantine/core'
 import {
   MoonIcon,
@@ -8,6 +9,32 @@ import {
 
 export function ThemeToggle() {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Hydrationエラーを防ぐため、クライアントサイドでマウントされるまで待機
+  if (!mounted) {
+    return (
+      <SegmentedControl
+        value="auto"
+        onChange={() => {}}
+        data={[
+          {
+            value: 'auto',
+            label: <ComputerDesktopIcon className="w-4 h-4" />,
+          },
+          { value: 'light', label: <SunIcon className="w-4 h-4" /> },
+          { value: 'dark', label: <MoonIcon className="w-4 h-4" /> },
+        ]}
+        size="xs"
+        aria-label="Change color scheme"
+        disabled
+      />
+    )
+  }
 
   return (
     <SegmentedControl
