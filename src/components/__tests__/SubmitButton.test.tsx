@@ -27,5 +27,6 @@ test('shows spinner when pending', () => {
       <SubmitButton>Send</SubmitButton>
     </MantineProvider>
   )
-  expect(container.querySelector('svg')).toBeTruthy()
+  // Mantine Loaderは'mantine-Loader-root'クラスを持つ要素を生成する
+  expect(container.querySelector('[class*="mantine-Loader"]')).toBeTruthy()
 })

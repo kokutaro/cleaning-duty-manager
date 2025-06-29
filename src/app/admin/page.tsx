@@ -4,6 +4,7 @@ import { regenerateThisWeekAssignments } from '@/lib/rotation'
 import { ConfirmDeleteButton } from './components/ConfirmDeleteButton'
 import { getWeekStart } from '@/lib/week'
 import { SubmitButton } from '@/components/SubmitButton'
+import { TextInput, Select } from '@mantine/core'
 
 export default async function AdminPage() {
   const members = await prisma.member.findMany({ include: { group: true } })
@@ -151,11 +152,11 @@ export default async function AdminPage() {
           action={addGroup}
           className="flex flex-col sm:flex-row gap-2 mb-4"
         >
-          <input
+          <TextInput
             name="groupName"
-            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="グループ名"
             required
+            className="w-full sm:w-auto"
           />
           <SubmitButton type="submit">追加</SubmitButton>
         </form>
@@ -181,23 +182,22 @@ export default async function AdminPage() {
           action={addMember}
           className="flex flex-col sm:flex-row gap-2 mb-4"
         >
-          <input
+          <TextInput
             name="memberName"
-            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="名前"
             required
+            className="w-full sm:w-auto"
           />
-          <select
+          <Select
             name="memberGroupId"
-            className="border px-2 py-1 rounded w-full sm:w-auto"
-          >
-            <option value="">未割当</option>
-            {groups.map(g => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
+            placeholder="未割当"
+            data={[
+              { value: '', label: '未割当' },
+              ...groups.map(g => ({ value: g.id.toString(), label: g.name })),
+            ]}
+            className="w-full sm:w-auto"
+            clearable
+          />
           <SubmitButton type="submit">追加</SubmitButton>
         </form>
         <ul className="divide-y divide-neutral-700 border border-neutral-700 rounded-md">
@@ -211,10 +211,10 @@ export default async function AdminPage() {
                 className="flex flex-col sm:flex-row gap-2"
               >
                 <input type="hidden" name="memberId" value={m.id} />
-                <input
+                <TextInput
                   name="memberName"
                   defaultValue={m.name}
-                  className="border px-2 py-1 rounded w-full sm:w-auto"
+                  className="w-full sm:w-auto"
                 />
                 <SubmitButton type="submit" variant="success">
                   保存
@@ -226,18 +226,19 @@ export default async function AdminPage() {
                   className="flex flex-col sm:flex-row gap-2"
                 >
                   <input type="hidden" name="memberId" value={m.id} />
-                  <select
+                  <Select
                     name="memberGroupId"
-                    defaultValue={m.groupId ?? ''}
-                    className="border px-2 py-1 rounded w-full sm:w-auto"
-                  >
-                    <option value="">未割当</option>
-                    {groups.map(g => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
+                    defaultValue={m.groupId?.toString() ?? ''}
+                    data={[
+                      { value: '', label: '未割当' },
+                      ...groups.map(g => ({
+                        value: g.id.toString(),
+                        label: g.name,
+                      })),
+                    ]}
+                    className="w-full sm:w-auto"
+                    clearable
+                  />
                   <SubmitButton type="submit" variant="success">
                     変更
                   </SubmitButton>
@@ -258,23 +259,22 @@ export default async function AdminPage() {
           action={addPlace}
           className="flex flex-col sm:flex-row gap-2 mb-4"
         >
-          <input
+          <TextInput
             name="placeName"
-            className="border px-2 py-1 rounded w-full sm:w-auto"
             placeholder="場所名"
             required
+            className="w-full sm:w-auto"
           />
-          <select
+          <Select
             name="placeGroupId"
-            className="border px-2 py-1 rounded w-full sm:w-auto"
-          >
-            <option value="">未割当</option>
-            {groups.map(g => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
+            placeholder="未割当"
+            data={[
+              { value: '', label: '未割当' },
+              ...groups.map(g => ({ value: g.id.toString(), label: g.name })),
+            ]}
+            className="w-full sm:w-auto"
+            clearable
+          />
           <SubmitButton variant="success" type="submit">
             追加
           </SubmitButton>
@@ -290,10 +290,10 @@ export default async function AdminPage() {
                 className="flex flex-col sm:flex-row gap-2"
               >
                 <input type="hidden" name="placeId" value={p.id} />
-                <input
+                <TextInput
                   name="placeName"
                   defaultValue={p.name}
-                  className="border px-2 py-1 rounded w-full sm:w-auto"
+                  className="w-full sm:w-auto"
                 />
                 <SubmitButton type="submit" variant="success">
                   保存
@@ -305,18 +305,19 @@ export default async function AdminPage() {
                   className="flex flex-col sm:flex-row gap-2"
                 >
                   <input type="hidden" name="placeId" value={p.id} />
-                  <select
+                  <Select
                     name="placeGroupId"
-                    defaultValue={p.groupId ?? ''}
-                    className="border px-2 py-1 rounded w-full sm:w-auto"
-                  >
-                    <option value="">未割当</option>
-                    {groups.map(g => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
+                    defaultValue={p.groupId?.toString() ?? ''}
+                    data={[
+                      { value: '', label: '未割当' },
+                      ...groups.map(g => ({
+                        value: g.id.toString(),
+                        label: g.name,
+                      })),
+                    ]}
+                    className="w-full sm:w-auto"
+                    clearable
+                  />
                   <SubmitButton type="submit" variant="success">
                     変更
                   </SubmitButton>
