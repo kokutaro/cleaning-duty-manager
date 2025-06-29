@@ -3,6 +3,7 @@ import { autoRotateIfNeeded } from "@/lib/rotation";
 import { getWeekStart } from "@/lib/week";
 import { updateRotation } from "./actions/rotation";
 import { SubmitButton } from "@/components/SubmitButton";
+import { Paper } from "@mantine/core";
 import { format } from "date-fns";
 
 export async function HomeContent() {
@@ -69,23 +70,26 @@ export async function HomeContent() {
                 <h2 className="text-xl font-semibold mb-2">{g.name}</h2>
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4">
                   {g.places.map(({ place, member }) => (
-                    <div
+                    <Paper
                       key={place.id}
-                      className="w-full sm:w-48 border rounded-md p-4 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700"
+                      withBorder
+                      p="md"
+                      radius="md"
+                      className="w-full sm:w-48"
                     >
                       <h3 className="text-lg font-semibold mb-2">{place.name}</h3>
                       <p>{member ? member.name : "未割当"}</p>
-                    </div>
+                    </Paper>
                   ))}
                   {g.noneMembers.length > 0 && (
-                    <div className="w-full sm:w-48 border rounded-md p-4 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700">
+                    <Paper withBorder p="md" radius="md" className="w-full sm:w-48">
                       <h3 className="text-lg font-semibold mb-2">なし</h3>
                       <ul className="list-disc list-inside">
                         {g.noneMembers.map((m) => (
                           <li key={m.id}>{m.name}</li>
                         ))}
                       </ul>
-                    </div>
+                    </Paper>
                   )}
                 </div>
               </div>
