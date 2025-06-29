@@ -159,12 +159,15 @@ export default async function AdminPage() {
             <SubmitButton type="submit">追加</SubmitButton>
           </Group>
         </form>
-        <Stack gap="xs" className="border border-neutral-700 rounded-md">
+        <Stack
+          gap="xs"
+          className="border border-gray-300 dark:border-gray-700 rounded-md"
+        >
           {groups.map(g => (
             <Group
               key={g.id}
               justify="space-between"
-              className="px-4 py-2 border-b border-neutral-700 last:border-b-0"
+              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
             >
               <span>{g.name}</span>
               <form action={deleteGroup}>
@@ -199,11 +202,14 @@ export default async function AdminPage() {
             <SubmitButton type="submit">追加</SubmitButton>
           </Group>
         </form>
-        <Stack gap="xs" className="border border-neutral-700 rounded-md">
+        <Stack
+          gap="xs"
+          className="border border-gray-300 dark:border-gray-700 rounded-md"
+        >
           {members.map(m => (
             <div
               key={m.id}
-              className="px-4 py-2 border-b border-neutral-700 last:border-b-0"
+              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
             >
               <Group justify="space-between" wrap="wrap">
                 <form action={updateMemberName}>
@@ -279,11 +285,14 @@ export default async function AdminPage() {
             </SubmitButton>
           </Group>
         </form>
-        <Stack gap="xs" className="border border-neutral-700 rounded-md">
+        <Stack
+          gap="xs"
+          className="border border-gray-300 dark:border-gray-700 rounded-md"
+        >
           {places.map(p => (
             <div
               key={p.id}
-              className="px-4 py-2 border-b border-neutral-700 last:border-b-0"
+              className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
             >
               <Group justify="space-between" wrap="wrap">
                 <form action={updatePlaceName}>
