@@ -6,10 +6,7 @@
       "request": "launch",
       "name": "Next.js: debug",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev"
-      ],
+      "runtimeArgs": ["run", "dev"],
       "port": 9229,
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env"

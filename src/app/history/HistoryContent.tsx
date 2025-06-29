@@ -1,34 +1,34 @@
-import { prisma } from "@/lib/prisma";
-import { getAssignmentCounts } from "@/lib/history";
-import { format } from "date-fns";
+import { prisma } from '@/lib/prisma'
+import { getAssignmentCounts } from '@/lib/history'
+import { format } from 'date-fns'
 
 export async function HistoryContent() {
   const weeks = await prisma.week.findMany({
-    orderBy: { startDate: "desc" },
+    orderBy: { startDate: 'desc' },
     include: {
       assignments: {
         include: { place: true, member: true },
-        orderBy: { placeId: "asc" },
+        orderBy: { placeId: 'asc' },
       },
     },
-  });
+  })
 
   const countList = (await getAssignmentCounts()).sort(
     (a, b) =>
       a.memberName.localeCompare(b.memberName) ||
       a.placeName.localeCompare(b.placeName)
-  );
+  )
 
-  const members = Array.from(
-    new Set(countList.map((c) => c.memberName))
-  ).sort((a, b) => a.localeCompare(b));
-  const places = Array.from(
-    new Set(countList.map((c) => c.placeName))
-  ).sort((a, b) => a.localeCompare(b));
-  const matrix: Record<string, Record<string, number>> = {};
+  const members = Array.from(new Set(countList.map(c => c.memberName))).sort(
+    (a, b) => a.localeCompare(b)
+  )
+  const places = Array.from(new Set(countList.map(c => c.placeName))).sort(
+    (a, b) => a.localeCompare(b)
+  )
+  const matrix: Record<string, Record<string, number>> = {}
   for (const c of countList) {
-    if (!matrix[c.memberName]) matrix[c.memberName] = {};
-    matrix[c.memberName][c.placeName] = c.count;
+    if (!matrix[c.memberName]) matrix[c.memberName] = {}
+    matrix[c.memberName][c.placeName] = c.count
   }
 
   return (
@@ -36,13 +36,16 @@ export async function HistoryContent() {
       <section>
         <h1 className="text-2xl font-bold mb-6">アサイン履歴</h1>
         <div className="flex flex-col gap-8">
-          {weeks.map((w) => (
-            <div key={w.id} className="border border-neutral-700 rounded-md p-4">
+          {weeks.map(w => (
+            <div
+              key={w.id}
+              className="border border-neutral-700 rounded-md p-4"
+            >
               <h2 className="text-xl font-semibold mb-2">
-                {format(w.startDate, "yyyy年MM月dd日")}
+                {format(w.startDate, 'yyyy年MM月dd日')}
               </h2>
               <ul className="list-disc list-inside space-y-1">
-                {w.assignments.map((a) => (
+                {w.assignments.map(a => (
                   <li key={a.id}>
                     {a.place.name}: {a.member.name}
                   </li>
@@ -58,7 +61,7 @@ export async function HistoryContent() {
           <thead>
             <tr>
               <th className="border-b border-neutral-700 p-2">メンバー\場所</th>
-              {places.map((p) => (
+              {places.map(p => (
                 <th
                   key={p}
                   className="border-b border-neutral-700 p-2 text-right"
@@ -69,10 +72,10 @@ export async function HistoryContent() {
             </tr>
           </thead>
           <tbody>
-            {members.map((m) => (
+            {members.map(m => (
               <tr key={m}>
                 <th className="border-b border-neutral-800 p-2">{m}</th>
-                {places.map((p) => (
+                {places.map(p => (
                   <td
                     key={p}
                     className="border-b border-neutral-800 p-2 text-right"
@@ -86,5 +89,5 @@ export async function HistoryContent() {
         </table>
       </section>
     </>
-  );
+  )
 }

@@ -39,4 +39,3 @@ Run lint and tests with:
 npm run lint
 npm run test
 ```
-
