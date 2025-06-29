@@ -1,146 +1,25 @@
 import { prisma } from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
-import { regenerateThisWeekAssignments } from '@/lib/rotation'
 import { ConfirmDeleteButton } from './components/ConfirmDeleteButton'
-import { getWeekStart } from '@/lib/week'
 import { SubmitButton } from '@/components/SubmitButton'
 import { TextInput, Select, Group, Stack } from '@mantine/core'
+import {
+  addMember,
+  deleteMember,
+  updateMemberName,
+  updateMemberGroup,
+} from '../actions/members'
+import {
+  addPlace,
+  deletePlace,
+  updatePlaceName,
+  updatePlaceGroup,
+} from '../actions/places'
+import { addGroup, deleteGroup } from '../actions/groups'
 
 export default async function AdminPage() {
   const members = await prisma.member.findMany({ include: { group: true } })
   const places = await prisma.place.findMany({ include: { group: true } })
   const groups = await prisma.group.findMany()
-
-  async function addMember(formData: FormData) {
-    'use server'
-    const name = formData.get('memberName') as string
-    const groupIdValue = formData.get('memberGroupId') as string
-    const groupId = groupIdValue ? Number(groupIdValue) : null
-    if (name) {
-      await prisma.member.create({ data: { name, groupId } })
-      await regenerateThisWeekAssignments()
-      revalidatePath('/admin')
-      revalidatePath('/')
-    }
-  }
-
-  async function addPlace(formData: FormData) {
-    'use server'
-    const name = formData.get('placeName') as string
-    const groupIdValue = formData.get('placeGroupId') as string
-    const groupId = groupIdValue ? Number(groupIdValue) : null
-    if (name) {
-      await prisma.place.create({ data: { name, groupId } })
-      await regenerateThisWeekAssignments()
-      revalidatePath('/admin')
-      revalidatePath('/')
-    }
-  }
-
-  async function deleteMember(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('memberId'))
-    if (!id) return
-
-    // サーバーアクション内で再取得
-    const weekStart = getWeekStart()
-    const week = await prisma.week.findUnique({
-      where: { startDate: weekStart },
-      include: { assignments: true },
-    })
-
-    const assigned = week?.assignments.some(a => a.memberId === id)
-    await prisma.member.delete({ where: { id } })
-    if (assigned) {
-      await regenerateThisWeekAssignments()
-    }
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function deletePlace(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('placeId'))
-    if (!id) return
-
-    // サーバーアクション内で再取得
-    const weekStart = getWeekStart()
-    const week = await prisma.week.findUnique({
-      where: { startDate: weekStart },
-      include: { assignments: true },
-    })
-
-    const assigned = week?.assignments.some(a => a.placeId === id)
-    await prisma.place.delete({ where: { id } })
-    if (assigned) {
-      await regenerateThisWeekAssignments()
-    }
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function updateMemberName(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('memberId'))
-    const name = formData.get('memberName') as string
-    if (!id || !name) return
-    await prisma.member.update({ where: { id }, data: { name } })
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function updatePlaceName(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('placeId'))
-    const name = formData.get('placeName') as string
-    if (!id || !name) return
-    await prisma.place.update({ where: { id }, data: { name } })
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function addGroup(formData: FormData) {
-    'use server'
-    const name = formData.get('groupName') as string
-    if (name) {
-      await prisma.group.create({ data: { name } })
-      revalidatePath('/admin')
-      revalidatePath('/')
-    }
-  }
-
-  async function deleteGroup(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('groupId'))
-    if (!id) return
-    await prisma.group.delete({ where: { id } })
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function updateMemberGroup(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('memberId'))
-    const groupIdValue = formData.get('memberGroupId') as string
-    const groupId = groupIdValue ? Number(groupIdValue) : null
-    if (!id) return
-    await prisma.member.update({ where: { id }, data: { groupId } })
-    await regenerateThisWeekAssignments()
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
-
-  async function updatePlaceGroup(formData: FormData) {
-    'use server'
-    const id = Number(formData.get('placeId'))
-    const groupIdValue = formData.get('placeGroupId') as string
-    const groupId = groupIdValue ? Number(groupIdValue) : null
-    if (!id) return
-    await prisma.place.update({ where: { id }, data: { groupId } })
-    await regenerateThisWeekAssignments()
-    revalidatePath('/admin')
-    revalidatePath('/')
-  }
 
   return (
     <main className="mx-auto w-full max-w-4xl py-10 px-4">
