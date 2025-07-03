@@ -6,6 +6,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './test/setup.ts',
     coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: './coverage',
       exclude: [
         // Config files
         '*.config.*',
