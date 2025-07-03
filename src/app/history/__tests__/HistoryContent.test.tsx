@@ -21,6 +21,9 @@ vi.mock('date-fns', () => ({
 import { prisma } from '@/lib/prisma'
 import { getAssignmentCounts, type CountResult } from '@/lib/history'
 
+// 型安全なモック関数
+const mockGetAssignmentCounts = vi.mocked(getAssignmentCounts)
+
 // モックされたprismaを型アサーション
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const prismaMock = prisma as any
@@ -69,9 +72,7 @@ beforeEach(() => {
 
   // デフォルトのモック設定
   prismaMock.week.findMany.mockResolvedValue([])
-  ;(
-    getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-  ).mockResolvedValue([])
+  mockGetAssignmentCounts.mockResolvedValue([])
 })
 
 afterEach(() => {
@@ -82,9 +83,7 @@ describe('HistoryContentData Logic', () => {
   test('データがない場合に空の配列とオブジェクトを返す', async () => {
     // Arrange
     prismaMock.week.findMany.mockResolvedValue([])
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue([])
+    mockGetAssignmentCounts.mockResolvedValue([])
 
     // Act
     const result = await getHistoryContentData()
@@ -136,9 +135,7 @@ describe('HistoryContentData Logic', () => {
     ]
 
     prismaMock.week.findMany.mockResolvedValue(mockWeeks)
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue([])
+    mockGetAssignmentCounts.mockResolvedValue([])
 
     // Act
     const result = await getHistoryContentData()
@@ -177,9 +174,7 @@ describe('HistoryContentData Logic', () => {
     ]
 
     prismaMock.week.findMany.mockResolvedValue([])
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue(mockCountList)
+    mockGetAssignmentCounts.mockResolvedValue(mockCountList)
 
     // Act
     const result = await getHistoryContentData()
@@ -237,9 +232,7 @@ describe('HistoryContentData Logic', () => {
     ]
 
     prismaMock.week.findMany.mockResolvedValue([])
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue(mockCountList)
+    mockGetAssignmentCounts.mockResolvedValue(mockCountList)
 
     // Act
     const result = await getHistoryContentData()
@@ -276,9 +269,7 @@ describe('HistoryContentData Logic', () => {
     ]
 
     prismaMock.week.findMany.mockResolvedValue([])
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue(mockCountList)
+    mockGetAssignmentCounts.mockResolvedValue(mockCountList)
 
     // Act
     const result = await getHistoryContentData()
@@ -348,9 +339,7 @@ describe('HistoryContentData Logic', () => {
     ]
 
     prismaMock.week.findMany.mockResolvedValue(mockWeeks)
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockResolvedValue(mockCountList)
+    mockGetAssignmentCounts.mockResolvedValue(mockCountList)
 
     // Act
     const result = await getHistoryContentData()
@@ -374,9 +363,9 @@ describe('HistoryContentData Logic', () => {
   test('getAssignmentCountsでエラーが発生した場合に適切にエラーを投げる', async () => {
     // Arrange
     prismaMock.week.findMany.mockResolvedValue([])
-    ;(
-      getAssignmentCounts as vi.MockedFunction<typeof getAssignmentCounts>
-    ).mockRejectedValue(new Error('Assignment count error'))
+    mockGetAssignmentCounts.mockRejectedValue(
+      new Error('Assignment count error')
+    )
 
     // Act & Assert
     await expect(getHistoryContentData()).rejects.toThrow(
