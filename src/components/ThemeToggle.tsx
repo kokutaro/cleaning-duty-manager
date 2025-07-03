@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useMantineColorScheme, SegmentedControl } from '@mantine/core'
 import {
   MoonIcon,

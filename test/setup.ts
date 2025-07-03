@@ -11,3 +11,24 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => false,
   }),
 })
+
+// ResizeObserverのモックを追加
+global.ResizeObserver = class ResizeObserver {
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+  }
+
+  observe() {
+    // モックの実装
+  }
+
+  unobserve() {
+    // モックの実装
+  }
+
+  disconnect() {
+    // モックの実装
+  }
+
+  private callback: ResizeObserverCallback
+}
