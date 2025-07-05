@@ -1,415 +1,347 @@
+import React from 'react'
 import { vi, expect, test, beforeEach, afterEach, describe } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MantineProvider } from '@mantine/core'
+
+// Prismaクライアントのモック化
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    week: {
+      findUnique: vi.fn(),
+    },
+    group: {
+      findMany: vi.fn(),
+    },
+    member: {
+      findMany: vi.fn(),
+    },
+    place: {
+      findMany: vi.fn(),
+    },
+  },
+}))
 
 // 外部依存関数のモック化
-vi.mock('@/lib/duty-assignment', () => ({
-  getDutyAssignmentData: vi.fn(),
+vi.mock('@/lib/rotation', () => ({
+  autoRotateIfNeeded: vi.fn(),
+}))
+
+vi.mock('@/lib/week', () => ({
+  getWeekStart: vi.fn(() => new Date('2024-01-01')),
 }))
 
 vi.mock('date-fns', () => ({
   format: vi.fn(() => '2024年01月01日'),
 }))
 
-import {
-  getDutyAssignmentData,
-  type GroupedAssignments,
-} from '@/lib/duty-assignment'
+vi.mock('./actions/rotation', () => ({
+  updateRotation: vi.fn(),
+}))
+
+import { prisma } from '@/lib/prisma'
+import { autoRotateIfNeeded } from '@/lib/rotation'
+import { HomeContent } from '../HomeContent'
 
 // 型安全なモック関数
-const mockGetDutyAssignmentData = vi.mocked(getDutyAssignmentData)
+const mockAutoRotateIfNeeded = vi.mocked(autoRotateIfNeeded)
 
-// HomeContentコンポーネントのロジック部分を抽出したテスト用関数
-async function getHomeContentData() {
-  return await getDutyAssignmentData()
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const prismaMock = prisma as any
 
 beforeEach(() => {
   vi.clearAllMocks()
 
   // デフォルトのモック設定
-  mockGetDutyAssignmentData.mockResolvedValue({
-    weekStart: new Date('2024-01-01'),
-    members: [],
-    groupedAssignments: [],
-  })
+  mockAutoRotateIfNeeded.mockResolvedValue(undefined)
+  prismaMock.week.findUnique.mockResolvedValue(null)
+  prismaMock.group.findMany.mockResolvedValue([])
+  prismaMock.member.findMany.mockResolvedValue([])
+  prismaMock.place.findMany.mockResolvedValue([])
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('HomeContentData Logic', () => {
-  test('メンバーがいない場合に空の配列を返す', async () => {
+// サーバーコンポーネント用のレンダリングヘルパー
+async function renderHomeContent() {
+  const jsx = await HomeContent()
+  return render(<MantineProvider>{jsx}</MantineProvider>)
+}
+
+describe('HomeContent', () => {
+  test('メンバーがいない場合にエラーメッセージを表示する', async () => {
     // Arrange
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: new Date('2024-01-01'),
-      members: [],
-      groupedAssignments: [],
-    })
+    prismaMock.member.findMany.mockResolvedValue([])
+    prismaMock.place.findMany.mockResolvedValue([])
+    prismaMock.group.findMany.mockResolvedValue([])
 
     // Act
-    const result = await getHomeContentData()
+    await renderHomeContent()
 
     // Assert
-    expect(result.members).toEqual([])
-    expect(result.groupedAssignments).toEqual([])
-    expect(result.weekStart).toEqual(new Date('2024-01-01'))
+    expect(screen.getByText('今週のお掃除当番')).toBeInTheDocument()
+    expect(screen.getByText('週の開始日: 2024年01月01日')).toBeInTheDocument()
+    expect(screen.getByText('ローテーション更新')).toBeInTheDocument()
+    expect(
+      screen.getByText('ユーザーが登録されていません。')
+    ).toBeInTheDocument()
   })
 
-  test('メンバーと場所がある場合に適切に返される', async () => {
+  test('メンバーと場所がある場合に割り当て情報を表示する', async () => {
     // Arrange
-    const mockGroupedAssignments: GroupedAssignments[] = [
-      {
-        name: 'グループA',
-        places: [
-          {
-            place: {
-              id: 1,
-              name: 'キッチン',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-            member: {
-              id: 1,
-              name: '田中太郎',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-          },
-        ],
-        noneMembers: [],
-      },
-      {
-        name: 'グループB',
-        places: [
-          {
-            place: {
-              id: 2,
-              name: 'トイレ',
-              groupId: 2,
-              group: {
-                id: 2,
-                name: 'グループB',
-              },
-            },
-            member: null,
-          },
-        ],
-        noneMembers: [
-          {
-            id: 2,
-            name: '佐藤花子',
-            groupId: 2,
-            group: {
-              id: 2,
-              name: 'グループB',
-            },
-          },
-        ],
-      },
-    ]
+    const mockWeek = {
+      id: 1,
+      startDate: new Date('2024-01-01'),
+      assignments: [
+        {
+          id: 1,
+          placeId: 1,
+          memberId: 1,
+          place: { id: 1, name: 'キッチン' },
+          member: { id: 1, name: '田中太郎' },
+        },
+      ],
+    }
 
     const mockMembers = [
       {
         id: 1,
         name: '田中太郎',
         groupId: 1,
-        group: {
+        group: { id: 1, name: 'グループA' },
+      },
+    ]
+
+    const mockPlaces = [
+      {
+        id: 1,
+        name: 'キッチン',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
+      },
+    ]
+
+    const mockGroups = [{ id: 1, name: 'グループA' }]
+
+    prismaMock.week.findUnique.mockResolvedValue(mockWeek)
+    prismaMock.member.findMany.mockResolvedValue(mockMembers)
+    prismaMock.place.findMany.mockResolvedValue(mockPlaces)
+    prismaMock.group.findMany.mockResolvedValue(mockGroups)
+
+    // Act
+    await renderHomeContent()
+
+    // Assert
+    expect(screen.getByText('今週のお掃除当番')).toBeInTheDocument()
+    expect(screen.getByText('グループA')).toBeInTheDocument()
+    expect(screen.getByText('キッチン')).toBeInTheDocument()
+    expect(screen.getByText('田中太郎')).toBeInTheDocument()
+    expect(
+      screen.queryByText('ユーザーが登録されていません。')
+    ).not.toBeInTheDocument()
+  })
+
+  test('複数のグループと場所がある場合に正しく表示される', async () => {
+    // Arrange
+    const mockWeek = {
+      id: 1,
+      startDate: new Date('2024-01-01'),
+      assignments: [
+        {
           id: 1,
-          name: 'グループA',
+          placeId: 1,
+          memberId: 1,
+          place: { id: 1, name: 'キッチン' },
+          member: { id: 1, name: '田中太郎' },
         },
+        {
+          id: 2,
+          placeId: 2,
+          memberId: 2,
+          place: { id: 2, name: 'トイレ' },
+          member: { id: 2, name: '佐藤花子' },
+        },
+      ],
+    }
+
+    const mockMembers = [
+      {
+        id: 1,
+        name: '田中太郎',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
       },
       {
         id: 2,
         name: '佐藤花子',
         groupId: 2,
-        group: {
-          id: 2,
-          name: 'グループB',
-        },
+        group: { id: 2, name: 'グループB' },
       },
     ]
 
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: new Date('2024-01-01'),
-      members: mockMembers,
-      groupedAssignments: mockGroupedAssignments,
-    })
+    const mockPlaces = [
+      {
+        id: 1,
+        name: 'キッチン',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
+      },
+      {
+        id: 2,
+        name: 'トイレ',
+        groupId: 2,
+        group: { id: 2, name: 'グループB' },
+      },
+    ]
+
+    const mockGroups = [
+      { id: 1, name: 'グループA' },
+      { id: 2, name: 'グループB' },
+    ]
+
+    prismaMock.week.findUnique.mockResolvedValue(mockWeek)
+    prismaMock.member.findMany.mockResolvedValue(mockMembers)
+    prismaMock.place.findMany.mockResolvedValue(mockPlaces)
+    prismaMock.group.findMany.mockResolvedValue(mockGroups)
 
     // Act
-    const result = await getHomeContentData()
+    await renderHomeContent()
 
     // Assert
-    expect(result.members).toHaveLength(2)
-    expect(result.members[0].name).toBe('田中太郎')
-    expect(result.members[1].name).toBe('佐藤花子')
-    expect(result.groupedAssignments).toHaveLength(2)
-    expect(result.groupedAssignments[0].name).toBe('グループA')
-    expect(result.groupedAssignments[1].name).toBe('グループB')
+    expect(screen.getByText('グループA')).toBeInTheDocument()
+    expect(screen.getByText('グループB')).toBeInTheDocument()
+    expect(screen.getByText('キッチン')).toBeInTheDocument()
+    expect(screen.getByText('トイレ')).toBeInTheDocument()
+    expect(screen.getByText('田中太郎')).toBeInTheDocument()
+    expect(screen.getByText('佐藤花子')).toBeInTheDocument()
   })
 
-  test('グループ別に割り当て情報が正しく整理される', async () => {
+  test('未割当の場所がある場合に「未割当」と表示される', async () => {
     // Arrange
-    const mockGroupedAssignments: GroupedAssignments[] = [
+    const mockWeek = {
+      id: 1,
+      startDate: new Date('2024-01-01'),
+      assignments: [], // 割り当てなし
+    }
+
+    const mockMembers = [
       {
-        name: 'グループA',
-        places: [
-          {
-            place: {
-              id: 1,
-              name: 'キッチン',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-            member: {
-              id: 1,
-              name: '田中太郎',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-          },
-          {
-            place: {
-              id: 2,
-              name: 'リビング',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-            member: null,
-          },
-        ],
-        noneMembers: [
-          {
-            id: 2,
-            name: '佐藤花子',
-            groupId: 1,
-            group: {
-              id: 1,
-              name: 'グループA',
-            },
-          },
-        ],
+        id: 1,
+        name: '田中太郎',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
       },
     ]
 
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: new Date('2024-01-01'),
-      members: [
+    const mockPlaces = [
+      {
+        id: 1,
+        name: 'キッチン',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
+      },
+    ]
+
+    const mockGroups = [{ id: 1, name: 'グループA' }]
+
+    prismaMock.week.findUnique.mockResolvedValue(mockWeek)
+    prismaMock.member.findMany.mockResolvedValue(mockMembers)
+    prismaMock.place.findMany.mockResolvedValue(mockPlaces)
+    prismaMock.group.findMany.mockResolvedValue(mockGroups)
+
+    // Act
+    await renderHomeContent()
+
+    // Assert
+    expect(screen.getByText('キッチン')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '未割当' })).toBeInTheDocument()
+  })
+
+  test('未割当のメンバーがいる場合に「なし」セクションに表示される', async () => {
+    // Arrange
+    const mockWeek = {
+      id: 1,
+      startDate: new Date('2024-01-01'),
+      assignments: [
         {
           id: 1,
-          name: '田中太郎',
-          groupId: 1,
-          group: {
-            id: 1,
-            name: 'グループA',
-          },
-        },
-        {
-          id: 2,
-          name: '佐藤花子',
-          groupId: 1,
-          group: {
-            id: 1,
-            name: 'グループA',
-          },
+          placeId: 1,
+          memberId: 1,
+          place: { id: 1, name: 'キッチン' },
+          member: { id: 1, name: '田中太郎' },
         },
       ],
-      groupedAssignments: mockGroupedAssignments,
-    })
+    }
 
-    // Act
-    const result = await getHomeContentData()
-
-    // Assert
-    expect(result.groupedAssignments).toHaveLength(1)
-    expect(result.groupedAssignments[0].name).toBe('グループA')
-    expect(result.groupedAssignments[0].places).toHaveLength(2)
-    expect(result.groupedAssignments[0].places[0].member?.name).toBe('田中太郎')
-    expect(result.groupedAssignments[0].places[1].member).toBeNull()
-    expect(result.groupedAssignments[0].noneMembers).toHaveLength(1)
-    expect(result.groupedAssignments[0].noneMembers[0].name).toBe('佐藤花子')
-  })
-
-  test('複数グループで未割当メンバーが存在する場合', async () => {
-    // Arrange
-    const mockGroupedAssignments: GroupedAssignments[] = [
+    const mockMembers = [
       {
-        name: 'グループA',
-        places: [
-          {
-            place: {
-              id: 1,
-              name: 'キッチン',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-            member: {
-              id: 1,
-              name: '田中太郎',
-              groupId: 1,
-              group: {
-                id: 1,
-                name: 'グループA',
-              },
-            },
-          },
-        ],
-        noneMembers: [
-          {
-            id: 2,
-            name: '佐藤花子',
-            groupId: 1,
-            group: {
-              id: 1,
-              name: 'グループA',
-            },
-          },
-        ],
+        id: 1,
+        name: '田中太郎',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
       },
       {
-        name: 'グループB',
-        places: [],
-        noneMembers: [
-          {
-            id: 3,
-            name: '鈴木次郎',
-            groupId: 2,
-            group: {
-              id: 2,
-              name: 'グループB',
-            },
-          },
-        ],
+        id: 2,
+        name: '佐藤花子',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
       },
     ]
 
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: new Date('2024-01-01'),
-      members: [
-        {
-          id: 1,
-          name: '田中太郎',
-          groupId: 1,
-          group: {
-            id: 1,
-            name: 'グループA',
-          },
-        },
-        {
-          id: 2,
-          name: '佐藤花子',
-          groupId: 1,
-          group: {
-            id: 1,
-            name: 'グループA',
-          },
-        },
-        {
-          id: 3,
-          name: '鈴木次郎',
-          groupId: 2,
-          group: {
-            id: 2,
-            name: 'グループB',
-          },
-        },
-      ],
-      groupedAssignments: mockGroupedAssignments,
-    })
-
-    // Act
-    const result = await getHomeContentData()
-
-    // Assert
-    expect(result.groupedAssignments).toHaveLength(2)
-    expect(result.groupedAssignments[0].noneMembers).toHaveLength(1)
-    expect(result.groupedAssignments[0].noneMembers[0].name).toBe('佐藤花子')
-    expect(result.groupedAssignments[1].noneMembers).toHaveLength(1)
-    expect(result.groupedAssignments[1].noneMembers[0].name).toBe('鈴木次郎')
-  })
-
-  test('getDutyAssignmentDataでエラーが発生した場合に適切にエラーを投げる', async () => {
-    // Arrange
-    mockGetDutyAssignmentData.mockRejectedValue(
-      new Error('Duty assignment data error')
-    )
-
-    // Act & Assert
-    await expect(getHomeContentData()).rejects.toThrow(
-      'Duty assignment data error'
-    )
-  })
-
-  test('週の開始日が正しく設定される', async () => {
-    // Arrange
-    const testWeekStart = new Date('2024-02-05')
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: testWeekStart,
-      members: [],
-      groupedAssignments: [],
-    })
-
-    // Act
-    const result = await getHomeContentData()
-
-    // Assert
-    expect(result.weekStart).toEqual(testWeekStart)
-  })
-
-  test('空の場所とメンバーがある場合', async () => {
-    // Arrange
-    const mockGroupedAssignments: GroupedAssignments[] = [
+    const mockPlaces = [
       {
-        name: '未割当',
-        places: [],
-        noneMembers: [
-          {
-            id: 1,
-            name: '田中太郎',
-            groupId: null,
-            group: null,
-          },
-        ],
+        id: 1,
+        name: 'キッチン',
+        groupId: 1,
+        group: { id: 1, name: 'グループA' },
       },
     ]
 
-    mockGetDutyAssignmentData.mockResolvedValue({
-      weekStart: new Date('2024-01-01'),
-      members: [
-        {
-          id: 1,
-          name: '田中太郎',
-          groupId: null,
-          group: null,
-        },
-      ],
-      groupedAssignments: mockGroupedAssignments,
-    })
+    const mockGroups = [{ id: 1, name: 'グループA' }]
+
+    prismaMock.week.findUnique.mockResolvedValue(mockWeek)
+    prismaMock.member.findMany.mockResolvedValue(mockMembers)
+    prismaMock.place.findMany.mockResolvedValue(mockPlaces)
+    prismaMock.group.findMany.mockResolvedValue(mockGroups)
 
     // Act
-    const result = await getHomeContentData()
+    await renderHomeContent()
 
     // Assert
-    expect(result.groupedAssignments).toHaveLength(1)
-    expect(result.groupedAssignments[0].name).toBe('未割当')
-    expect(result.groupedAssignments[0].places).toHaveLength(0)
-    expect(result.groupedAssignments[0].noneMembers).toHaveLength(1)
+    expect(screen.getByText('なし')).toBeInTheDocument()
+    expect(screen.getByText('佐藤花子')).toBeInTheDocument()
+  })
+
+  test('基本的なUI要素が正しく表示される', async () => {
+    // Arrange
+    prismaMock.member.findMany.mockResolvedValue([])
+    prismaMock.place.findMany.mockResolvedValue([])
+    prismaMock.group.findMany.mockResolvedValue([])
+
+    // Act
+    await renderHomeContent()
+
+    // Assert
+    expect(
+      screen.getByRole('heading', { level: 1, name: '今週のお掃除当番' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'ローテーション更新' })
+    ).toBeInTheDocument()
+    expect(screen.getByText('週の開始日: 2024年01月01日')).toBeInTheDocument()
+  })
+
+  test('autoRotateIfNeededが呼び出される', async () => {
+    // Arrange
+    prismaMock.member.findMany.mockResolvedValue([])
+    prismaMock.place.findMany.mockResolvedValue([])
+    prismaMock.group.findMany.mockResolvedValue([])
+
+    // Act
+    await renderHomeContent()
+
+    // Assert
+    expect(mockAutoRotateIfNeeded).toHaveBeenCalledWith(new Date('2024-01-01'))
   })
 })
