@@ -1,5 +1,8 @@
-import { getAssignmentCounts } from '@/lib/history'
-import { prisma } from '@/lib/prisma'
+import React from 'react'
+import {
+  getWeeksWithAssignments,
+  getCleaningCountMatrix,
+} from '@/lib/history-data'
 import {
   Card,
   Table,
@@ -12,33 +15,8 @@ import {
 import { format } from 'date-fns'
 
 export async function HistoryContent() {
-  const weeks = await prisma.week.findMany({
-    orderBy: { startDate: 'desc' },
-    include: {
-      assignments: {
-        include: { place: true, member: true },
-        orderBy: { placeId: 'asc' },
-      },
-    },
-  })
-
-  const countList = (await getAssignmentCounts()).sort(
-    (a, b) =>
-      a.memberName.localeCompare(b.memberName) ||
-      a.placeName.localeCompare(b.placeName)
-  )
-
-  const members = Array.from(new Set(countList.map(c => c.memberName))).sort(
-    (a, b) => a.localeCompare(b)
-  )
-  const places = Array.from(new Set(countList.map(c => c.placeName))).sort(
-    (a, b) => a.localeCompare(b)
-  )
-  const matrix: Record<string, Record<string, number>> = {}
-  for (const c of countList) {
-    if (!matrix[c.memberName]) matrix[c.memberName] = {}
-    matrix[c.memberName][c.placeName] = c.count
-  }
+  const weeks = await getWeeksWithAssignments()
+  const { members, places, matrix } = await getCleaningCountMatrix()
 
   return (
     <>
