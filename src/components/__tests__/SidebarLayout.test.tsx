@@ -1,8 +1,8 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, cleanup } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
 import { SidebarLayout } from '../SidebarLayout'
-import { expect, test, vi } from 'vitest'
+import { expect, test, vi, afterEach } from 'vitest'
 
 // Next.jsのusePathnameとLinkをモック
 vi.mock('next/navigation', () => ({
@@ -28,6 +28,12 @@ vi.mock('next/link', () => ({
 vi.mock('../ThemeToggle', () => ({
   ThemeToggle: () => <div data-testid="theme-toggle">ThemeToggle</div>,
 }))
+
+// テスト後のクリーンアップ
+afterEach(() => {
+  cleanup()
+  vi.clearAllTimers()
+})
 
 test('renders SidebarLayout with children', () => {
   const { getByText } = render(
