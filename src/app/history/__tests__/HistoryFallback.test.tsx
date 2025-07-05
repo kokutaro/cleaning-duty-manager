@@ -1,6 +1,5 @@
-import React from 'react'
-import { render } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
+import { render } from '@testing-library/react'
 import { expect, test } from 'vitest'
 import HistoryFallback from '../HistoryFallback'
 

@@ -1,8 +1,7 @@
-import React from 'react'
-import { render } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
-import { Spinner } from '../Spinner'
+import { render } from '@testing-library/react'
 import { expect, test } from 'vitest'
+import { Spinner } from '../Spinner'
 
 test('renders Spinner component', () => {
   const { container } = render(

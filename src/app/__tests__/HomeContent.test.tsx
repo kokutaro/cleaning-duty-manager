@@ -1,7 +1,6 @@
-import React from 'react'
-import { vi, expect, test, beforeEach, afterEach, describe } from 'vitest'
-import { render, screen } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
+import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Prismaクライアントのモック化
 vi.mock('@/lib/prisma', () => ({
