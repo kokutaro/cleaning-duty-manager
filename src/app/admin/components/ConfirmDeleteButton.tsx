@@ -1,9 +1,8 @@
 'use client'
 
-import React from 'react'
-import { useFormStatus } from 'react-dom'
 import { Button, type ButtonProps } from '@/components/Button'
 import { Spinner } from '@/components/Spinner'
+import { useFormStatus } from 'react-dom'
 
 export function ConfirmDeleteButton({
   children,

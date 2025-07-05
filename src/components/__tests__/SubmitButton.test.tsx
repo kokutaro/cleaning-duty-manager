@@ -1,7 +1,6 @@
-import React from 'react'
-import { render } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
-import { vi, expect, test, type Mock } from 'vitest'
+import { render } from '@testing-library/react'
+import { expect, test, vi, type Mock } from 'vitest'
 import { SubmitButton } from '../SubmitButton'
 
 vi.mock('react-dom', async () => {

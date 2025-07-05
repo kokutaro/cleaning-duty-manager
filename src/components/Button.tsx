@@ -1,6 +1,7 @@
 'use client'
-import React from 'react'
+
 import { Button as MantineButton, type MantineColor } from '@mantine/core'
+import React from 'react'
 
 export type ButtonVariant = 'primary' | 'success' | 'danger'
 

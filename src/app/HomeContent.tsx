@@ -1,9 +1,8 @@
-import React from 'react'
-import { getDutyAssignmentData } from '@/lib/duty-assignment'
-import { updateRotation } from './actions/rotation'
 import { SubmitButton } from '@/components/SubmitButton'
+import { getDutyAssignmentData } from '@/lib/duty-assignment'
 import { Paper, Text } from '@mantine/core'
 import { format } from 'date-fns'
+import { updateRotation } from './actions/rotation'
 
 export async function HomeContent() {
   const { weekStart, members, groupedAssignments } =

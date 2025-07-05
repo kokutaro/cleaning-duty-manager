@@ -1,8 +1,7 @@
-import React from 'react'
-import { render, fireEvent, cleanup } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
+import { cleanup, fireEvent, render } from '@testing-library/react'
+import { afterEach, expect, test, vi } from 'vitest'
 import { ConfirmDeleteButton } from '../ConfirmDeleteButton'
-import { vi, expect, test, afterEach } from 'vitest'
 
 afterEach(() => {
   cleanup()

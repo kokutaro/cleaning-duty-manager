@@ -1,8 +1,7 @@
-import React from 'react'
-import { render, waitFor } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
-import { ThemeToggle } from '../ThemeToggle'
+import { render, waitFor } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
+import { ThemeToggle } from '../ThemeToggle'
 
 // useMantineColorSchemeをモック
 vi.mock('@mantine/core', async () => {

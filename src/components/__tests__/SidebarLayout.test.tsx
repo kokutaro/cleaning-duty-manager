@@ -1,8 +1,7 @@
-import React from 'react'
-import { render, fireEvent, cleanup } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
+import { cleanup, fireEvent, render } from '@testing-library/react'
+import { afterEach, expect, test, vi } from 'vitest'
 import { SidebarLayout } from '../SidebarLayout'
-import { expect, test, vi, afterEach } from 'vitest'
 
 // Next.jsのusePathnameとLinkをモック
 vi.mock('next/navigation', () => ({
