@@ -1,7 +1,7 @@
+import * as React from 'react'
 import { MantineProvider } from '@mantine/core'
-import { render, waitFor } from '@testing-library/react'
-import { expect, test, vi } from 'vitest'
-import { ThemeToggle } from '../ThemeToggle'
+import { render, waitFor, fireEvent } from '@testing-library/react'
+import { expect, test, vi, type Mock } from 'vitest'
 
 // useMantineColorSchemeをモック
 vi.mock('@mantine/core', async () => {
@@ -16,7 +16,10 @@ vi.mock('@mantine/core', async () => {
   }
 })
 
+const { useMantineColorScheme } = await import('@mantine/core')
+
 test('renders ThemeToggle component', async () => {
+  const { ThemeToggle } = await import('../ThemeToggle')
   const { container } = render(
     <MantineProvider>
       <ThemeToggle />
@@ -30,13 +33,15 @@ test('renders ThemeToggle component', async () => {
 
   // マウント後はコンポーネントが機能する
   await waitFor(() => {
-    expect(
-      container.querySelector('[class*="mantine-SegmentedControl"]')
-    ).toBeTruthy()
+    const segmented = container.querySelector(
+      '[class*="mantine-SegmentedControl"]'
+    ) as HTMLElement
+    expect(segmented.getAttribute('data-disabled')).toBeNull()
   })
 })
 
 test('renders SegmentedControl with correct aria-label', async () => {
+  const { ThemeToggle } = await import('../ThemeToggle')
   const { container } = render(
     <MantineProvider>
       <ThemeToggle />
@@ -51,15 +56,69 @@ test('renders SegmentedControl with correct aria-label', async () => {
   })
 })
 
-test('renders disabled SegmentedControl before mount', () => {
+test('renders disabled SegmentedControl before mount', async () => {
+  vi.doMock('react', async () => {
+    const actual = await vi.importActual<typeof import('react')>('react')
+    return { ...actual, useEffect: () => {} }
+  })
+  vi.resetModules()
+  const { ThemeToggle } = await import('../ThemeToggle')
+  const { container } = render(
+    <MantineProvider>
+      <ThemeToggle />
+    </MantineProvider>
+  )
+  const segmented = container.querySelector(
+    '[class*="mantine-SegmentedControl"]'
+  ) as HTMLElement
+  expect(segmented.getAttribute('data-disabled')).toBe('true')
+  vi.doUnmock('react')
+  vi.resetModules()
+})
+
+test('enables SegmentedControl after mount', async () => {
+  const { ThemeToggle } = await import('../ThemeToggle')
   const { container } = render(
     <MantineProvider>
       <ThemeToggle />
     </MantineProvider>
   )
 
-  // SegmentedControlがレンダリングされていることを確認
-  expect(
-    container.querySelector('[class*="mantine-SegmentedControl"]')
-  ).toBeTruthy()
+  await waitFor(() => {
+    const after = container.querySelector(
+      '[class*="mantine-SegmentedControl"]'
+    ) as HTMLElement
+    expect(after?.getAttribute('data-disabled')).toBeNull()
+  })
+})
+
+test('calls setColorScheme on change', async () => {
+  const { ThemeToggle } = await import('../ThemeToggle')
+  const setColorScheme = vi.fn()
+  ;(useMantineColorScheme as unknown as Mock).mockReturnValue({
+    colorScheme: 'light',
+    setColorScheme,
+  })
+
+  const { container } = render(
+    <MantineProvider>
+      <ThemeToggle />
+    </MantineProvider>
+  )
+
+  await waitFor(() => {
+    expect(
+      container.querySelector('[class*="mantine-SegmentedControl"]')
+    ).toBeTruthy()
+  })
+
+  const darkInput = container.querySelector('input[value="dark"]')
+  expect(darkInput).toBeTruthy()
+  if (darkInput) {
+    const label = container.querySelector(`label[for="${darkInput.id}"]`)
+    if (label) fireEvent.click(label)
+  }
+  await waitFor(() => {
+    expect(setColorScheme).toHaveBeenCalledWith('dark')
+  })
 })
