@@ -3,8 +3,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import RootLayout from '../layout'
 
 // Mock CSS imports to avoid PostCSS processing during tests
-vi.mock('../globals.css', () => ({}), { virtual: true })
-vi.mock('@mantine/core/styles.css', () => ({}), { virtual: true })
+vi.mock('../globals.css', () => ({}))
+vi.mock('@mantine/core/styles.css', () => ({}))
 
 // Mock Google fonts used in the layout
 vi.mock('next/font/google', () => ({
